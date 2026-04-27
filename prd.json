@@ -1,0 +1,86 @@
+{
+  "project": "LMM.best",
+  "branchName": "ralph/lmm-best-frontend",
+  "description": "LMM.best - Ranking and review platform for Large Multimodal Models",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Add hero section with animations",
+      "description": "As a visitor, I want to see an impressive hero section with animated stats and tagline.",
+      "acceptanceCriteria": [
+        "Hero section displays with large serif headline",
+        "Animated stats show: 47 Models, 12 Benchmarks, 2.1M+ Tests",
+        "Staggered fade-up animations on page load",
+        "Geometric decoration SVG visible",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Implement leaderboard table with scoring",
+      "description": "As a user, I want to see models ranked with scores and tier badges.",
+      "acceptanceCriteria": [
+        "Table shows 8 models with rank, name, vendor, tier badge, score bar, parameters, context",
+        "Score bars animate on scroll into view",
+        "Tier badges: S (gold), A (silver), B (bronze) displayed",
+        "Rank 1-3 have colored rank numbers",
+        "Hover effect highlights row",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Build model review cards grid",
+      "description": "As a user, I want to see detailed model reviews with specs and pros/cons.",
+      "acceptanceCriteria": [
+        "4 model cards displayed in responsive grid",
+        "Each card shows: name, vendor, star rating, specs (params, context, vision, audio)",
+        "Pros/cons sections with green/red styling",
+        "Cards animate in with stagger on scroll",
+        "Hover lift effect on cards",
+        "Typecheck passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Add navigation and footer",
+      "description": "As a user, I want to navigate between sections and see footer info.",
+      "acceptanceCriteria": [
+        "Sticky nav with backdrop blur and logo",
+        "Nav links: Leaderboard, Models, About",
+        "Footer with logo and description",
+        "Smooth scroll to sections on nav click",
+        "Typecheck passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Add responsive design for mobile",
+      "description": "As a mobile user, I want the site to work well on small screens.",
+      "acceptanceCriteria": [
+        "Nav links hidden on mobile",
+        "Hero stats wrap properly",
+        "Leaderboard hides less important columns on mobile",
+        "Cards grid becomes single column on mobile",
+        "Pros/cons stacks vertically on mobile",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}
