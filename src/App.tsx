@@ -162,16 +162,16 @@ function App() {
           </p>
           <div className="hero-stats">
             <div className="hero-stat">
-              <span className="hero-stat-value">47</span>
+              <span className="hero-stat-value">{models.length}</span>
               <span className="hero-stat-label">Models Ranked</span>
             </div>
             <div className="hero-stat">
-              <span className="hero-stat-value">12</span>
+              <span className="hero-stat-value">7</span>
               <span className="hero-stat-label">Benchmarks</span>
             </div>
             <div className="hero-stat">
-              <span className="hero-stat-value">2.1M+</span>
-              <span className="hero-stat-label">Tests Run</span>
+              <span className="hero-stat-value">Daily</span>
+              <span className="hero-stat-label">Updates</span>
             </div>
           </div>
         </div>
