@@ -1,86 +1,84 @@
 {
   "project": "LMM.best",
-  "branchName": "ralph/lmm-best-frontend",
-  "description": "LMM.best - Ranking and review platform for Large Multimodal Models",
+  "branchName": "ralph/lmm-best-v2",
+  "description": "LMM.best V2 - Enhanced with filtering, search, compare, and detailed benchmark sections",
   "userStories": [
     {
       "id": "US-001",
-      "title": "Add hero section with animations",
-      "description": "As a visitor, I want to see an impressive hero section with animated stats and tagline.",
+      "title": "Add tier filter buttons to leaderboard",
+      "description": "As a user, I want to filter models by tier (S/A/B/C) to focus on specific ranking levels.",
       "acceptanceCriteria": [
-        "Hero section displays with large serif headline",
-        "Animated stats show: 47 Models, 12 Benchmarks, 2.1M+ Tests",
-        "Staggered fade-up animations on page load",
-        "Geometric decoration SVG visible",
+        "Filter buttons above table: All, S Tier, A Tier, B Tier",
+        "Active filter has highlighted state",
+        "Table updates instantly on filter click",
+        "Model count updates to show filtered total",
         "Typecheck passes"
       ],
       "priority": 1,
       "passes": true,
-      "notes": "Implemented with Playfair Display serif font, DM Sans body, JetBrains Mono for stats. FadeUp animation with 0.1-0.4s delays."
+      "notes": "tier-filters component with active state styling"
     },
     {
       "id": "US-002",
-      "title": "Implement leaderboard table with scoring",
-      "description": "As a user, I want to see models ranked with scores and tier badges.",
+      "title": "Add search functionality to leaderboard",
+      "description": "As a user, I want to search for specific models by name or vendor.",
       "acceptanceCriteria": [
-        "Table shows 8 models with rank, name, vendor, tier badge, score bar, parameters, context",
-        "Score bars animate on scroll into view",
-        "Tier badges: S (gold), A (silver), B (bronze) displayed",
-        "Rank 1-3 have colored rank numbers",
-        "Hover effect highlights row",
+        "Search input field with placeholder 'Search models...'",
+        "Filters table in real-time as user types",
+        "Search is case-insensitive",
+        "Matches against both model name and vendor",
+        "Empty state message when no results",
         "Typecheck passes"
       ],
       "priority": 2,
       "passes": true,
-      "notes": "8 models rendered dynamically from data array. IntersectionObserver triggers score bar animation. Tier badges styled with tier colors."
+      "notes": "search-box component with real-time filtering using useMemo"
     },
     {
       "id": "US-003",
-      "title": "Build model review cards grid",
-      "description": "As a user, I want to see detailed model reviews with specs and pros/cons.",
+      "title": "Add benchmark methodology section",
+      "description": "As a user, I want to understand how models are scored by reading the methodology.",
       "acceptanceCriteria": [
-        "4 model cards displayed in responsive grid",
-        "Each card shows: name, vendor, star rating, specs (params, context, vision, audio)",
-        "Pros/cons sections with green/red styling",
-        "Cards animate in with stagger on scroll",
-        "Hover lift effect on cards",
+        "New 'Methodology' section between leaderboard and reviews",
+        "Shows 4 benchmarks: MMMU, MathVista, ChartQA, AI2D with descriptions",
+        "Score weightings displayed (percentage bars)",
+        "Clean card layout with icons",
         "Typecheck passes"
       ],
       "priority": 3,
       "passes": true,
-      "notes": "4 review cards with StarIcon and ArrowIcon components. Cards use IntersectionObserver for staggered reveal animation."
+      "notes": "benchmarks-grid with 4 cards showing benchmark weights"
     },
     {
       "id": "US-004",
-      "title": "Add navigation and footer",
-      "description": "As a user, I want to navigate between sections and see footer info.",
+      "title": "Add model comparison feature",
+      "description": "As a user, I want to compare up to 3 models side by side.",
       "acceptanceCriteria": [
-        "Sticky nav with backdrop blur and logo",
-        "Nav links: Leaderboard, Models, About",
-        "Footer with logo and description",
-        "Smooth scroll to sections on nav click",
+        "Checkbox on each leaderboard row to select for comparison",
+        "Compare button appears when 2+ models selected",
+        "Modal/panel shows side-by-side comparison of specs",
+        "Can clear selection",
+        "Max 3 models enforced",
         "Typecheck passes"
       ],
       "priority": 4,
       "passes": true,
-      "notes": "Nav uses position:fixed with backdrop-filter:blur(20px). Footer has same logo style. Smooth scroll via CSS."
+      "notes": "compare checkbox on each row, modal with side-by-side table"
     },
     {
       "id": "US-005",
-      "title": "Add responsive design for mobile",
-      "description": "As a mobile user, I want the site to work well on small screens.",
+      "title": "Add smooth page load skeleton",
+      "description": "As a user, I want to see loading skeletons while content loads for better UX.",
       "acceptanceCriteria": [
-        "Nav links hidden on mobile",
-        "Hero stats wrap properly",
-        "Leaderboard hides less important columns on mobile",
-        "Cards grid becomes single column on mobile",
-        "Pros/cons stacks vertically on mobile",
-        "Typecheck passes",
-        "Verify in browser using dev-browser skill"
+        "Skeleton UI for leaderboard rows (8 skeleton rows)",
+        "Skeleton for review cards (4 skeleton cards)",
+        "Animated shimmer effect on skeletons",
+        "Skeletons visible for 500ms minimum on page load",
+        "Typecheck passes"
       ],
       "priority": 5,
       "passes": true,
-      "notes": "Media query at 768px handles all responsive behavior. Columns 4-5 hidden on leaderboard."
+      "notes": "SkeletonRow and SkeletonCard components with shimmer animation"
     }
   ]
 }
