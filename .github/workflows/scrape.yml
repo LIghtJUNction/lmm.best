@@ -1,0 +1,69 @@
+name: Scrape LLM Data
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Daily at midnight
+  workflow_dispatch:  # Manual trigger
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+
+      - name: Install Playwright
+        run: bun add playwright && bunx playwright install chromium
+
+      - name: Scrape llmrank.cn
+        run: |
+          cat > scrape.mjs << 'EOF'
+          import { chromium } from 'playwright';
+
+          const url = 'https://llmrank.cn/';
+
+          async function scrape() {
+            const browser = await chromium.launch();
+            const page = await browser.newPage();
+
+            await page.goto(url, { waitUntil: 'networkidle' });
+            await page.waitForTimeout(3000); // Wait for JS to load
+
+            const data = await page.evaluate(() => {
+              const rows = document.querySelectorAll('table tbody tr');
+              const headers = Array.from(document.querySelectorAll('table thead th')).map(h => h.innerText.trim());
+
+              return Array.from(rows).slice(0, 20).map(row => {
+                const cells = row.querySelectorAll('td');
+                const obj = {};
+                cells.forEach((cell, i) => {
+                  obj[headers[i] || `col${i}`] = cell.innerText.trim();
+                });
+                return obj;
+              });
+            });
+
+            await browser.close();
+            return data;
+          }
+
+          scrape().then(data => {
+            console.log(JSON.stringify(data, null, 2));
+          }).catch(console.error);
+          EOF
+          node scrape.mjs
+
+      - name: Update models data
+        run: |
+          # This is a placeholder - in reality we'd parse the scraped data
+          # and update src/data.ts with real values
+          echo "Scraped data would be processed here"
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          title: 'chore: update LLM data from llmrank.cn'
+          commit-message: 'chore: update LLM data from llmrank.cn'
+          branch: chore/update-llm-data
