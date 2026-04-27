@@ -930,6 +930,37 @@ a {
   border-radius: 2px;
 }
 
+.scoring-formula {
+  margin-top: 3rem;
+  padding: 2rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  text-align: center;
+}
+
+.scoring-formula h3 {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 400;
+  margin-bottom: 1rem;
+}
+
+.scoring-formula code {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  padding: 1rem 2rem;
+  background: var(--surface-elevated);
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.scoring-formula p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
 /* Skeleton */
 @keyframes shimmer {
   0% { background-position: -200% 0; }

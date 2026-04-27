@@ -11,71 +11,15 @@ const models = [
   { rank: 8, name: 'DeepSeek V4 Pro', vendor: 'DeepSeek', initials: 'DS', tier: 'a', score: 52, params: '?B', context: '128K', date: '2026-04-24' },
 ]
 
-const reviews = [
-  {
-    name: 'GPT-5.5 (xhigh)',
-    vendor: 'OpenAI',
-    initials: 'OP',
-    rating: 5,
-    specs: { params: '?B', context: '128K', vision: 'Native', audio: 'Native' },
-    pros: ['Highest intelligence score', 'Excellent coding能力', 'Strong GPQA 93.5%'],
-    cons: ['Premium pricing ¥216/MT', 'High effort mode expensive'],
-    date: 'Reviewed Apr 2026',
-  },
-  {
-    name: 'Claude Opus 4.7',
-    vendor: 'Anthropic',
-    initials: 'AN',
-    rating: 5,
-    specs: { params: '?B', context: '200K', vision: 'Native', audio: 'Native' },
-    pros: ['Top reasoning capabilities', 'Constitutional AI safety', '200K context'],
-    cons: ['Expensive ¥180/MT output', 'Reasoning mode slower'],
-    date: 'Reviewed Apr 2026',
-  },
-  {
-    name: 'Kimi K2.6',
-    vendor: 'Kimi',
-    initials: 'KM',
-    rating: 4,
-    specs: { params: '?B', context: '128K', vision: 'Native', audio: 'via API' },
-    pros: ['Good value ¥6.84/MT input', '91.1% GPQA', 'Fast output speed'],
-    cons: ['Less known globally', 'Smaller context window'],
-    date: 'Reviewed Apr 2026',
-  },
-  {
-    name: 'DeepSeek V4 Pro',
-    vendor: 'DeepSeek',
-    initials: 'DS',
-    rating: 4,
-    specs: { params: '?B', context: '128K', vision: 'via API', audio: 'via API' },
-    pros: ['Competitive pricing ¥12.53/MT', '88.8% GPQA', 'Good reasoning'],
-    cons: ['Limited multimodal', 'No native audio'],
-    date: 'Reviewed Apr 2026',
-  },
-]
-
 const benchmarks = [
-  { name: 'MMMU', full: 'Massive Multimodal Multitask Understanding', weight: 35, desc: 'Tests reasoning across diverse academic disciplines' },
-  { name: 'MathVista', full: 'Mathematical Visual Reasoning', weight: 25, desc: 'Evaluates mathematical problem-solving with visuals' },
-  { name: 'ChartQA', full: 'Chart Understanding & Reasoning', weight: 20, desc: 'Measures interpretation of charts and data visualizations' },
-  { name: 'AI2D', full: 'AI2 Diagrams', weight: 20, desc: 'Assesses science diagram comprehension' },
+  { name: 'Intelligence Index', full: '综合能力指数', weight: 30, desc: '综合评估模型在各个维度的表现' },
+  { name: 'Coding Index', full: '编程能力指数', weight: 20, desc: '代码生成、调试和理解能力' },
+  { name: 'Math Index', full: '数学能力指数', weight: 15, desc: '数学推理和问题解决能力' },
+  { name: 'MMLU Pro', full: '学科知识测试', weight: 10, desc: '多学科选择题测试' },
+  { name: 'GPQA', full: '研究生水平问答', weight: 10, desc: '需要深度推理的专业问题' },
+  { name: 'IFBench', full: '指令遵循', weight: 10, desc: '精确遵循复杂指令的能力' },
+  { name: '输出速度', full: 'Tokens/秒', weight: 5, desc: '模型响应速度' },
 ]
-
-function StarIcon({ filled }: { filled: boolean }) {
-  return (
-    <svg className={`star ${filled ? '' : 'empty'}`} viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-    </svg>
-  )
-}
-
-function ArrowIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M5 12h14M12 5l7 7-7 7"/>
-    </svg>
-  )
-}
 
 function SearchIcon() {
   return (
@@ -124,21 +68,6 @@ function SkeletonRow() {
   )
 }
 
-function SkeletonCard() {
-  return (
-    <div className="card skeleton-card">
-      <div className="skeleton-card-header">
-        <div>
-          <div className="skeleton" style={{width: 140, height: 18, marginBottom: 6}}></div>
-          <div className="skeleton" style={{width: 80, height: 12}}></div>
-        </div>
-        <div className="skeleton" style={{width: 80, height: 16}}></div>
-      </div>
-      <div className="skeleton" style={{width: '100%', height: 80, marginTop: 16}}></div>
-    </div>
-  )
-}
-
 type TierFilter = 'all' | 's' | 'a' | 'b'
 
 function App() {
@@ -150,9 +79,7 @@ function App() {
 
   const heroRef = useRef<HTMLElement>(null)
   const leaderboardRef = useRef<HTMLElement>(null)
-  const cardsRef = useRef<HTMLElement>(null)
   const [leaderboardVisible, setLeaderboardVisible] = useState(false)
-  const [cardsVisible, setCardsVisible] = useState(false)
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 800)
@@ -164,14 +91,12 @@ function App() {
       ([entry]) => {
         if (entry.isIntersecting) {
           if (entry.target === leaderboardRef.current) setLeaderboardVisible(true)
-          if (entry.target === cardsRef.current) setCardsVisible(true)
         }
       },
       { threshold: 0.1 }
     )
     if (heroRef.current) observer.observe(heroRef.current)
     if (leaderboardRef.current) observer.observe(leaderboardRef.current)
-    if (cardsRef.current) observer.observe(cardsRef.current)
     return () => observer.disconnect()
   }, [])
 
@@ -222,8 +147,7 @@ function App() {
         </div>
         <ul className="nav-links">
           <li><a href="#leaderboard">Leaderboard</a></li>
-          <li><a href="#methodology">Methodology</a></li>
-          <li><a href="#models">Models</a></li>
+          <li><a href="#methodology">Scoring</a></li>
           <li><a href="#about">About</a></li>
         </ul>
       </nav>
@@ -234,7 +158,7 @@ function App() {
           <h1>Large Multimodal<br /><em>Models</em> Ranked</h1>
           <p className="hero-tagline">
             Simply the best Large Multimodal Models, ranked and reviewed.
-            Objective benchmarks, hands-on testing, and transparent methodology.
+            Data from llmrank.cn with transparent scoring methodology.
           </p>
           <div className="hero-stats">
             <div className="hero-stat">
@@ -266,7 +190,7 @@ function App() {
         <div className="section-header">
           <div>
             <h2 className="section-title">Leaderboard</h2>
-            <p className="section-subtitle">Updated April 2026 — Multimodal Understanding Score</p>
+            <p className="section-subtitle">Updated April 2026 — Intelligence Index Score</p>
           </div>
         </div>
 
@@ -371,8 +295,8 @@ function App() {
       <section className="section" id="methodology">
         <div className="section-header">
           <div>
-            <h2 className="section-title">Methodology</h2>
-            <p className="section-subtitle">How we evaluate and score Large Multimodal Models</p>
+            <h2 className="section-title">评分算法公开</h2>
+            <p className="section-subtitle">Data from llmrank.cn — Updated Daily</p>
           </div>
         </div>
         <div className="benchmarks-grid">
@@ -390,69 +314,10 @@ function App() {
             </div>
           ))}
         </div>
-      </section>
-
-      <section className="section" id="models" ref={cardsRef}>
-        <div className="section-header">
-          <div>
-            <h2 className="section-title">Model Reviews</h2>
-            <p className="section-subtitle">In-depth analysis and hands-on evaluation</p>
-          </div>
-        </div>
-        <div className="cards-grid">
-          {loading ? (
-            Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
-          ) : (
-            reviews.map((r, i) => (
-              <article
-                className={`card ${cardsVisible ? 'visible' : ''}`}
-                style={{ transitionDelay: `${i * 100}ms` }}
-                key={r.name}
-              >
-                <div className="card-header">
-                  <div>
-                    <div className="card-title">{r.name}</div>
-                    <div className="card-vendor">{r.vendor}</div>
-                  </div>
-                  <div className="card-rating">
-                    {[1,2,3,4,5].map(n => <StarIcon key={n} filled={n <= r.rating} />)}
-                  </div>
-                </div>
-                <div className="card-specs">
-                  <div className="spec">
-                    <span className="spec-label">Parameters</span>
-                    <span className="spec-value">{r.specs.params}</span>
-                  </div>
-                  <div className="spec">
-                    <span className="spec-label">Context</span>
-                    <span className="spec-value">{r.specs.context}</span>
-                  </div>
-                  <div className="spec">
-                    <span className="spec-label">Vision</span>
-                    <span className="spec-value">{r.specs.vision}</span>
-                  </div>
-                  <div className="spec">
-                    <span className="spec-label">Audio</span>
-                    <span className="spec-value">{r.specs.audio}</span>
-                  </div>
-                </div>
-                <div className="card-proscons">
-                  <div className="pros">
-                    <h4>Pros</h4>
-                    <ul>{r.pros.map(p => <li key={p}>{p}</li>)}</ul>
-                  </div>
-                  <div className="cons">
-                    <h4>Cons</h4>
-                    <ul>{r.cons.map(c => <li key={c}>{c}</li>)}</ul>
-                  </div>
-                </div>
-                <div className="card-footer">
-                  <span className="card-date">{r.date}</span>
-                  <a href="#" className="read-review">Read Review <ArrowIcon /></a>
-                </div>
-              </article>
-            ))
-          )}
+        <div className="scoring-formula">
+          <h3>综合分数计算公式</h3>
+          <code>Final Score = Σ(Benchmark_i × Weight_i) / Σ(Weight_i)</code>
+          <p>所有分数均来自 llmrank.cn 真实测试结果，每日更新。</p>
         </div>
       </section>
 
@@ -463,8 +328,7 @@ function App() {
             LMM.best
           </div>
           <p className="footer-text">
-            Independent benchmarking and reviews of Large Multimodal Models.
-            Our methodology combines automated benchmarks with human evaluation.
+            LLM 排行榜数据来源：llmrank.cn | 评分算法完全公开透明
           </p>
         </div>
       </footer>
