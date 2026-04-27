@@ -15,8 +15,8 @@
         "Typecheck passes"
       ],
       "priority": 1,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Implemented with Playfair Display serif font, DM Sans body, JetBrains Mono for stats. FadeUp animation with 0.1-0.4s delays."
     },
     {
       "id": "US-002",
@@ -31,8 +31,8 @@
         "Typecheck passes"
       ],
       "priority": 2,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "8 models rendered dynamically from data array. IntersectionObserver triggers score bar animation. Tier badges styled with tier colors."
     },
     {
       "id": "US-003",
@@ -47,8 +47,8 @@
         "Typecheck passes"
       ],
       "priority": 3,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "4 review cards with StarIcon and ArrowIcon components. Cards use IntersectionObserver for staggered reveal animation."
     },
     {
       "id": "US-004",
@@ -62,8 +62,8 @@
         "Typecheck passes"
       ],
       "priority": 4,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Nav uses position:fixed with backdrop-filter:blur(20px). Footer has same logo style. Smooth scroll via CSS."
     },
     {
       "id": "US-005",
@@ -79,8 +79,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Media query at 768px handles all responsive behavior. Columns 4-5 hidden on leaderboard."
     }
   ]
 }
