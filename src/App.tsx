@@ -1,15 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
-
-const models = [
-  { rank: 1, name: 'GPT-5.5 (xhigh)', vendor: 'OpenAI', initials: 'OP', tier: 's', score: 60, params: '?B', context: '128K', date: '2026-04-23' },
-  { rank: 2, name: 'GPT-5.5 (high)', vendor: 'OpenAI', initials: 'OP', tier: 's', score: 59, params: '?B', context: '128K', date: '2026-04-23' },
-  { rank: 3, name: 'Claude Opus 4.7 (Reasoning)', vendor: 'Anthropic', initials: 'AN', tier: 's', score: 57, params: '?B', context: '200K', date: '2026-04-16' },
-  { rank: 4, name: 'GPT-5.4 (xhigh)', vendor: 'OpenAI', initials: 'OP', tier: 's', score: 57, params: '?B', context: '128K', date: '2026-03-05' },
-  { rank: 5, name: 'Kimi K2.6', vendor: 'Kimi', initials: 'KM', tier: 'a', score: 54, params: '?B', context: '128K', date: '2026-04-20' },
-  { rank: 6, name: 'MiMo-V2.5-Pro', vendor: 'Xiaomi', initials: 'XM', tier: 'a', score: 54, params: '?B', context: '128K', date: '2026-04-22' },
-  { rank: 7, name: 'Muse Spark', vendor: 'Meta', initials: 'MT', tier: 'a', score: 52, params: '?B', context: '100K', date: '2026-04-08' },
-  { rank: 8, name: 'DeepSeek V4 Pro', vendor: 'DeepSeek', initials: 'DS', tier: 'a', score: 52, params: '?B', context: '128K', date: '2026-04-24' },
-]
+import { fetchAllData, type LLMModel } from './dataService'
 
 const benchmarks = [
   { name: 'Intelligence Index', full: '综合能力指数', weight: 30, desc: '综合评估模型在各个维度的表现' },
@@ -68,9 +58,10 @@ function SkeletonRow() {
   )
 }
 
-type TierFilter = 'all' | 's' | 'a' | 'b'
+type TierFilter = 'all' | 's' | 'a' | 'b' | 'c'
 
 function App() {
+  const [models, setModels] = useState<LLMModel[]>([])
   const [loading, setLoading] = useState(true)
   const [tierFilter, setTierFilter] = useState<TierFilter>('all')
   const [searchQuery, setSearchQuery] = useState('')
@@ -82,8 +73,10 @@ function App() {
   const [leaderboardVisible, setLeaderboardVisible] = useState(false)
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 800)
-    return () => clearTimeout(timer)
+    fetchAllData().then(data => {
+      setModels(data)
+      setLoading(false)
+    })
   }, [])
 
   useEffect(() => {
@@ -108,7 +101,7 @@ function App() {
         m.vendor.toLowerCase().includes(searchQuery.toLowerCase())
       return matchesTier && matchesSearch
     })
-  }, [tierFilter, searchQuery])
+  }, [models, tierFilter, searchQuery])
 
   const toggleCompare = (rank: number) => {
     setSelectedForCompare(prev => {
@@ -124,7 +117,7 @@ function App() {
 
   const compareModels = useMemo(() => {
     return models.filter(m => selectedForCompare.includes(m.rank))
-  }, [selectedForCompare])
+  }, [models, selectedForCompare])
 
   const clearCompare = () => {
     setSelectedForCompare([])
@@ -136,7 +129,8 @@ function App() {
     s: models.filter(m => m.tier === 's').length,
     a: models.filter(m => m.tier === 'a').length,
     b: models.filter(m => m.tier === 'b').length,
-  }), [])
+    c: models.filter(m => m.tier === 'c').length,
+  }), [models])
 
   return (
     <>
@@ -157,8 +151,7 @@ function App() {
           <div className="hero-eyebrow">The Definitive Ranking</div>
           <h1>Large Multimodal<br /><em>Models</em> Ranked</h1>
           <p className="hero-tagline">
-            Simply the best Large Multimodal Models, ranked and reviewed.
-            Data from llmrank.cn with transparent scoring methodology.
+            Real data from HuggingFace API. Transparent methodology, no fake benchmarks.
           </p>
           <div className="hero-stats">
             <div className="hero-stat">
@@ -166,12 +159,12 @@ function App() {
               <span className="hero-stat-label">Models Ranked</span>
             </div>
             <div className="hero-stat">
-              <span className="hero-stat-value">7</span>
+              <span className="hero-stat-value">{benchmarks.length}</span>
               <span className="hero-stat-label">Benchmarks</span>
             </div>
             <div className="hero-stat">
-              <span className="hero-stat-value">Daily</span>
-              <span className="hero-stat-label">Updates</span>
+              <span className="hero-stat-value">HF API</span>
+              <span className="hero-stat-label">Data Source</span>
             </div>
           </div>
         </div>
@@ -190,7 +183,7 @@ function App() {
         <div className="section-header">
           <div>
             <h2 className="section-title">Leaderboard</h2>
-            <p className="section-subtitle">Updated April 2026 — Intelligence Index Score</p>
+            <p className="section-subtitle">Updated {new Date().toLocaleDateString()} — Multimodal Models</p>
           </div>
         </div>
 
@@ -271,8 +264,8 @@ function App() {
                       <span className="score-value">{m.score}</span>
                     </div>
                   </td>
-                  <td className="metric">{m.params}</td>
-                  <td className="metric">{m.context}</td>
+                  <td className="metric">{m.parameters || '?'}</td>
+                  <td className="metric">{m.contextLength || '?'}</td>
                   <td>
                     <label className="compare-checkbox">
                       <input
@@ -296,7 +289,7 @@ function App() {
         <div className="section-header">
           <div>
             <h2 className="section-title">评分算法公开</h2>
-            <p className="section-subtitle">Data from llmrank.cn — Updated Daily</p>
+            <p className="section-subtitle">Data from HuggingFace — Updated in Real-time</p>
           </div>
         </div>
         <div className="benchmarks-grid">
@@ -315,9 +308,9 @@ function App() {
           ))}
         </div>
         <div className="scoring-formula">
-          <h3>综合分数计算公式</h3>
-          <code>Final Score = Σ(Benchmark_i × Weight_i) / Σ(Weight_i)</code>
-          <p>所有分数均来自 llmrank.cn 真实测试结果，每日更新。</p>
+          <h3>评分说明</h3>
+          <code>Score = f(downloads, likes, recency)</code>
+          <p>数据来自 HuggingFace API，基于模型下载量、点赞数和发布更新时间综合计算。</p>
         </div>
       </section>
 
@@ -328,7 +321,7 @@ function App() {
             LMM.best
           </div>
           <p className="footer-text">
-            LLM 排行榜数据来源：llmrank.cn | 评分算法完全公开透明
+            数据来源：HuggingFace API | 评分算法完全透明
           </p>
         </div>
       </footer>
@@ -363,11 +356,11 @@ function App() {
                   </tr>
                   <tr>
                     <td>Parameters</td>
-                    {compareModels.map(m => <td key={m.rank}>{m.params}</td>)}
+                    {compareModels.map(m => <td key={m.rank}>{m.parameters || '?'}</td>)}
                   </tr>
                   <tr>
                     <td>Context</td>
-                    {compareModels.map(m => <td key={m.rank}>{m.context}</td>)}
+                    {compareModels.map(m => <td key={m.rank}>{m.contextLength || '?'}</td>)}
                   </tr>
                 </tbody>
               </table>
