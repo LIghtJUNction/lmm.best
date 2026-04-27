@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LMM.best - Simply the Best Large Multimodal Models</title>
+  <meta name="description" content="LMM.best: The definitive ranking and review platform for Large Multimodal Models. Compare capabilities, performance, and value.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #0a0a0a;
+      --surface: #141414;
+      --surface-elevated: #1a1a1a;
+      --text-primary: #f5f5f5;
+      --text-secondary: #888888;
+      --accent: #d4a574;
+      --accent-muted: #8b7355;
+      --border: #2a2a2a;
+      --tier-s: #ffd700;
+      --tier-a: #c0c0c0;
+      --tier-b: #cd7f32;
+      --tier-c: #6b7280;
+
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-body: 'DM Sans', -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* Grain overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      opacity: 0.03;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    ::selection {
+      background: var(--accent);
+      color: var(--bg);
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* Navigation */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 1.25rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(10, 10, 10, 0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      font-family: var(--font-mono);
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .logo-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--text-primary);
+    }
+
+    /* Hero */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 8rem 2rem 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 10%;
+      right: -5%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+      opacity: 0.05;
+      pointer-events: none;
+    }
+
+    .hero-content {
+      max-width: 900px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.1s;
+    }
+
+    .hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(3rem, 8vw, 5.5rem);
+      font-weight: 400;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.2s;
+    }
+
+    .hero h1 em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .hero-tagline {
+      font-size: 1.25rem;
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin-bottom: 3rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.3s;
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: 3rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.4s;
+    }
+
+    .hero-stat {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .hero-stat-value {
+      font-family: var(--font-mono);
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .hero-stat-label {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Geometric decoration */
+    .hero-decoration {
+      position: absolute;
+      right: 10%;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 300px;
+      height: 300px;
+      opacity: 0.1;
+    }
+
+    .hero-decoration svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Section */
+    .section {
+      padding: 6rem 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 3rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: 2.5rem;
+      font-weight: 400;
+    }
+
+    .section-subtitle {
+      color: var(--text-secondary);
+      margin-top: 0.5rem;
+    }
+
+    /* Leaderboard */
+    .leaderboard {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .leaderboard th {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      text-align: left;
+      padding: 1rem;
+      border-bottom: 1px solid var(--border);
+      font-weight: 500;
+    }
+
+    .leaderboard th:last-child,
+    .leaderboard td:last-child {
+      text-align: right;
+    }
+
+    .leaderboard td {
+      padding: 1.25rem 1rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    .leaderboard tr {
+      transition: background 0.2s;
+    }
+
+    .leaderboard tbody tr:hover {
+      background: var(--surface);
+    }
+
+    .rank {
+      font-family: var(--font-mono);
+      font-size: 1.5rem;
+      font-weight: 700;
+      width: 60px;
+    }
+
+    .rank-1 { color: var(--tier-s); }
+    .rank-2 { color: var(--tier-a); }
+    .rank-3 { color: var(--tier-b); }
+
+    .model-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .model-avatar {
+      width: 40px;
+      height: 40px;
+      background: var(--surface-elevated);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--accent);
+      border: 1px solid var(--border);
+    }
+
+    .model-name {
+      font-weight: 600;
+      display: block;
+    }
+
+    .model-vendor {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+    }
+
+    .tier-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .tier-badge.s { background: rgba(255, 215, 0, 0.15); color: var(--tier-s); border: 1px solid rgba(255, 215, 0, 0.3); }
+    .tier-badge.a { background: rgba(192, 192, 192, 0.1); color: var(--tier-a); border: 1px solid rgba(192, 192, 192, 0.3); }
+    .tier-badge.b { background: rgba(205, 127, 50, 0.1); color: var(--tier-b); border: 1px solid rgba(205, 127, 50, 0.3); }
+    .tier-badge.c { background: rgba(107, 114, 128, 0.1); color: var(--tier-c); border: 1px solid rgba(107, 114, 128, 0.3); }
+
+    .score-cell {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .score-bar {
+      width: 120px;
+      height: 6px;
+      background: var(--surface-elevated);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .score-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-muted), var(--accent));
+      border-radius: 3px;
+      width: 0;
+      transition: width 1s ease;
+    }
+
+    .score-value {
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      font-weight: 600;
+      min-width: 40px;
+    }
+
+    .metric {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    /* Cards Grid */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      transition: all 0.3s ease;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent-muted);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1.25rem;
+    }
+
+    .card-title {
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+
+    .card-vendor {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    .card-rating {
+      display: flex;
+      gap: 2px;
+    }
+
+    .star {
+      width: 16px;
+      height: 16px;
+      color: var(--accent);
+    }
+
+    .star.empty {
+      color: var(--border);
+    }
+
+    .card-specs {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+      padding: 1rem;
+      background: var(--surface-elevated);
+      border-radius: 8px;
+    }
+
+    .spec {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .spec-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-secondary);
+    }
+
+    .spec-value {
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .card-proscons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+      font-size: 0.85rem;
+    }
+
+    .pros h4, .cons h4 {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
+    .pros h4 { color: #4ade80; }
+    .cons h4 { color: #f87171; }
+
+    .pros ul, .cons ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .pros li, .cons li {
+      color: var(--text-secondary);
+      padding-left: 1rem;
+      position: relative;
+    }
+
+    .pros li::before {
+      content: '+';
+      position: absolute;
+      left: 0;
+      color: #4ade80;
+    }
+
+    .cons li::before {
+      content: '−';
+      position: absolute;
+      left: 0;
+      color: #f87171;
+    }
+
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .card-date {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    .read-review {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: gap 0.2s;
+    }
+
+    .read-review:hover {
+      gap: 0.75rem;
+    }
+
+    .read-review svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* Footer */
+    .footer {
+      padding: 4rem 2rem;
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+
+    .footer-content {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .footer-logo {
+      font-family: var(--font-mono);
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .footer-text {
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+      }
+
+      .hero {
+        padding: 6rem 1.5rem 3rem;
+      }
+
+      .hero-stats {
+        flex-wrap: wrap;
+        gap: 2rem;
+      }
+
+      .section {
+        padding: 4rem 1.5rem;
+      }
+
+      .section-title {
+        font-size: 2rem;
+      }
+
+      .leaderboard th:nth-child(4),
+      .leaderboard th:nth-child(5),
+      .leaderboard td:nth-child(4),
+      .leaderboard td:nth-child(5) {
+        display: none;
+      }
+
+      .cards-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .card-proscons {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="logo">
+      <span class="logo-dot"></span>
+      LMM.best
+    </div>
+    <ul class="nav-links">
+      <li><a href="#leaderboard">Leaderboard</a></li>
+      <li><a href="#models">Models</a></li>
+      <li><a href="#about">About</a></li>
+    </ul>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-eyebrow">The Definitive Ranking</div>
+      <h1>Large Multimodal<br><em>Models</em> Ranked</h1>
+      <p class="hero-tagline">Simply the best Large Multimodal Models, ranked and reviewed. Objective benchmarks, hands-on testing, and transparent methodology.</p>
+
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <span class="hero-stat-value">47</span>
+          <span class="hero-stat-label">Models Ranked</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-value">12</span>
+          <span class="hero-stat-label">Benchmarks</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-value">2.1M+</span>
+          <span class="hero-stat-label">Tests Run</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-decoration">
+      <svg viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="150" cy="150" r="140" stroke="currentColor" stroke-width="0.5" opacity="0.3"/>
+        <circle cx="150" cy="150" r="100" stroke="currentColor" stroke-width="0.5" opacity="0.2"/>
+        <circle cx="150" cy="150" r="60" stroke="currentColor" stroke-width="0.5" opacity="0.1"/>
+        <line x1="150" y1="10" x2="150" y2="290" stroke="currentColor" stroke-width="0.3" opacity="0.1"/>
+        <line x1="10" y1="150" x2="290" y2="150" stroke="currentColor" stroke-width="0.3" opacity="0.1"/>
+      </svg>
+    </div>
+  </section>
+
+  <section class="section" id="leaderboard">
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">Leaderboard</h2>
+        <p class="section-subtitle">Updated April 2026 — Multimodal Understanding Score</p>
+      </div>
+    </div>
+
+    <table class="leaderboard">
+      <thead>
+        <tr>
+          <th>Rank</th>
+          <th>Model</th>
+          <th>Tier</th>
+          <th>Score</th>
+          <th>Parameters</th>
+          <th>Context</th>
+          <th>Last Updated</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="rank rank-1">#1</td>
+          <td>
+            <div class="model-info">
+              <div class="model-avatar">OP</div>
+              <div>
+                <span class="model-name">OpenMind OS-2</span>
+                <span class="model-vendor">OpenMind AI</span>
+              </div>
+            </div>
+          </td>
+          <td><span class="tier-badge s">S</span></td>
+          <td>
+            <div class="score-cell">
+              <div class="score-bar"><div class="score-fill" data-width="98"></div></div>
+              <span class="score-value">98</span>
+            </div>
+          </td>
+          <td class="metric">1.8T</td>
+          <td class="metric">256K</td>
+          <td class="metric">2026-04-15</td>
+        </tr>
+        <tr>
+          <td class="rank rank-2">#2</td>
+          <td>
+            <div class="model-info">
+              <div class="model-avatar">GC</div>
+              <div>
+                <span class="model-name">Gemini Ultra 3</span>
+                <span class="model-vendor">Google DeepMind</span>
+              </div>
+            </div>
+          </td>
+          <td><span class="tier-badge s">S</span></td>
+          <td>
+            <div class="score-cell">
+              <div class="score-bar"><div class="score-fill" data-width="96"></div></div>
+              <span class="score-value">96</span>
+            </div>
+          </td>
+          <td class="metric">2.0T</td>
+          <td class="metric">1M</td>
+          <td class="metric">2026-04-10</td>
+        </tr>
+        <tr>
+          <td class="rank rank-3">#3</td>
+          <td>
+            <div class="model-info">
+              <div class="model-avatar">CX</div>
+              <div>
+                <span class="model-name">Claude Opus 4</span>
+                <span class="model-vendor">Anthropic</span>
+              </div>
+            </div>
+          </td>
+          <td><span class="tier-badge s">S</span></td>
+          <td>
+            <div class="score-cell">
+              <div class="score-bar"><div class="score-fill" data-width="95"></div></div>
+              <span class="score-value">95</span>
+            </div>
+          </td>
+          <td class="metric">1.5T</td>
+          <td class="metric">200K</td>
+          <td class="metric">2026-04-12</td>
+        </tr>
+        <tr>
+          <td class="rank">#4</td>
+          <td>
+            <div class="model-info">
+              <div class="model-avatar">GP</div>
+              <div>
+                <span class="model-name">GPT-5 Vision</span>
+                <span class="model-vendor">OpenAI</span>
+              </div>
+            </div>
+          </td>
+          <td><span class="tier-badge a">A</span></td>
+          <td>
+            <div class="score-cell">
+              <div class="score-bar"><div class="score-fill" data-width="92"></div></div>
+              <span class="score-value">92</span>
+            </div>
+          </td>
+          <td class="metric">1.2T</td>
+          <td class="metric">128K</td>
+          <td class="metric">2026-04-08</td>
+        </tr>
+        <tr>
+          <td class="rank">#5</td>
+          <td>
+            <div class="model-info">
+              <div class="model-avatar">LM</div>
+              <div>
+                <span class="model-name">LLaMA-4 Vision</span>
+                <span class="model-vendor">Meta AI</span>
+              </div>
+            </div>
+          </td>
+          <td><span class="tier-badge a">A</span></td>
+          <td>
+            <div class="score-cell">
+              <div class="score-bar"><div class="score-fill" data-width="89"></div></div>
+              <span class="score-value">89</span>
+            </div>
+          </td>
+          <td class="metric">400B</td>
+          <td class="metric">100K</td>
+          <td class="metric">2026-04-05</td>
+        </tr>
+        <tr>
+          <td class="rank">#6</td>
+          <td>
+            <div class="model-info">
+              <div class="model-avatar">MX</div>
+              <div>
+                <span class="model-name">Mistral Large 2 Vision</span>
+                <span class="model-vendor">Mistral AI</span>
+              </div>
+            </div>
+          </td>
+          <td><span class="tier-badge a">A</span></td>
+          <td>
+            <div class="score-cell">
+              <div class="score-bar"><div class="score-fill" data-width="87"></div></div>
+              <span class="score-value">87</span>
+            </div>
+          </td>
+          <td class="metric">180B</td>
+          <td class="metric">128K</td>
+          <td class="metric">2026-04-01</td>
+        </tr>
+        <tr>
+          <td class="rank">#7</td>
+          <td>
+            <div class="model-info">
+              <div class="model-avatar">Q9</div>
+              <div>
+                <span class="model-name">Qwen2.5 VL Max</span>
+                <span class="model-vendor">Alibaba</span>
+              </div>
+            </div>
+          </td>
+          <td><span class="tier-badge b">B</span></td>
+          <td>
+            <div class="score-cell">
+              <div class="score-bar"><div class="score-fill" data-width="84"></div></div>
+              <span class="score-value">84</span>
+            </div>
+          </td>
+          <td class="metric">72B</td>
+          <td class="metric">32K</td>
+          <td class="metric">2026-03-28</td>
+        </tr>
+        <tr>
+          <td class="rank">#8</td>
+          <td>
+            <div class="model-info">
+              <div class="model-avatar">CO</div>
+              <div>
+                <span class="model-name">Cohere Command R+ V2</span>
+                <span class="model-vendor">Cohere</span>
+              </div>
+            </div>
+          </td>
+          <td><span class="tier-badge b">B</span></td>
+          <td>
+            <div class="score-cell">
+              <div class="score-bar"><div class="score-fill" data-width="81"></div></div>
+              <span class="score-value">81</span>
+            </div>
+          </td>
+          <td class="metric">104B</td>
+          <td class="metric">128K</td>
+          <td class="metric">2026-03-25</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="section" id="models">
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">Model Reviews</h2>
+        <p class="section-subtitle">In-depth analysis and hands-on evaluation</p>
+      </div>
+    </div>
+
+    <div class="cards-grid">
+      <article class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">OpenMind OS-2</div>
+            <div class="card-vendor">OpenMind AI</div>
+          </div>
+          <div class="card-rating">
+            <svg class="star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg class="star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg class="star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg class="star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg class="star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </div>
+        </div>
+        <div class="card-specs">
+          <div class="spec">
+            <span class="spec-label">Parameters</span>
+            <span class="spec-value">1.8T</span>
+          </div>
+          <div class="spec">
+            <span class="spec-label">Context</span>
+            <span class="spec-value">256K</span>
+          </div>
+          <div class="spec">
+            <span class="spec-label">Vision</span>
+            <span class="spec-value">Native</span>
+          </div>
+          <div class="spec">
+            <span class="spec-label">Audio</span>
+            <span class="spec-value">Native</span>
+          </div>
+        </div>
+        <div class="card-proscons">
+          <div class="pros">
+            <h4>Pros</h4>
+            <ul>
+              <li>State-of-the-art reasoning</li>
+              <li>Exceptional multimodal</li>
+              <li>256K context window</li>
+            </ul>
+          </div>
+          <div class="cons">
+            <h4>Cons</h4>
+            <ul>
+              <li>Premium pricing</li>
+              <li>Higher latency</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card-footer">
+          <span class="card-date">Reviewed Apr 2026</span>
+          <a href="#" class="read-review">Read Review <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Gemini Ultra 3</div>
+            <div class="card-vendor">Google DeepMind</div>
+          </div>
+          <div class="card-rating">
+            <svg class="star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg class="star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg class="star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg class="star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg class="star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </div>
+        </div>
+        <div class="card-specs">
+          <div class="spec">
+            <span class="spec-label">Parameters</span>
+            <span class="spec-value">2.0T</span>
+          </div>
+          <div class="spec">
+            <span class="spec-label">Context</span>
+            <span class="spec-value">1M</span>
+          </div>
+          <div class="spec">
+            <span class="spec-label">Vision</span>
+            <span class="spec-value">Native</span>
+          </div>
+          <div class="spec">
+            <span class="spec-label">Audio</span>
+            <span class="spec-value">Native</span>
+          </div>
+        </div>
+        <div class="card-proscons">
+          <div class="pros">
+            <h4>Pros</h4>
+            <ul>
+              <li>Massive 1M context</li>
+              <li>Native audio support</li>
+              <li>Google ecosystem</li>
+            </ul>
+          </div>
+          <div class="cons">
+            <h4>Cons</h4>
+            <ul>
+              <li>Complex pricing</li>
+              <li>Region restrictions</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card-footer">
+          <span class="card-date">Reviewed Apr 2026</span>
+          <a href="#" class="read-review">Read Review <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Claude Opus 4</div>
+            <div class="card-vendor">Anthropic</div>
+          </div>
+          <div class="card-rating">
+            <svg class="star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg class="star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg class="star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg class="star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg class="star empty" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </div>
+        </div>
+        <div class="card-specs">
+          <div class="spec">
+            <span class="spec-label">Parameters</span>
+            <span class="spec-value">1.5T</span>
+          </div>
+          <div class="spec">
+            <span class="spec-label">Context</span>
+            <span class="spec-value">200K</span>
+          </div>
+          <div class="spec">
+            <span class="spec-label">Vision</span>
+            <span class="spec-value">Native</span>
+          </div>
+          <div class="spec">
+            <span class="spec-label">Audio</span>
+            <span class="spec-value">via API</span>
+          </div>
+        </div>
+        <div class="card-proscons">
+          <div class="pros">
+            <h4>Pros</h4>
+            <ul>
+              <li>Best-in-class reasoning</li>
+              <li>Constitutional AI safety</li>
+              <li>Excellent writing</li>
+            </ul>
+          </div>
+          <div class="cons">
+            <h4>Cons</h4>
+            <ul>
+              <li>No native audio</li>
+              <li>Priced per token</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card-footer">
+          <span class="card-date">Reviewed Apr 2026</span>
+          <a href="#" class="read-review">Read Review <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">GPT-5 Vision</div>
+            <div class="card-vendor">OpenAI</div>
+          </div>
+          <div class="card-rating">
+            <svg class="star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg class="star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg class="star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg class="star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg class="star empty" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </div>
+        </div>
+        <div class="card-specs">
+          <div class="spec">
+            <span class="spec-label">Parameters</span>
+            <span class="spec-value">1.2T</span>
+          </div>
+          <div class="spec">
+            <span class="spec-label">Context</span>
+            <span class="spec-value">128K</span>
+          </div>
+          <div class="spec">
+            <span class="spec-label">Vision</span>
+            <span class="spec-value">Native</span>
+          </div>
+          <div class="spec">
+            <span class="spec-label">Audio</span>
+            <span class="spec-value">via API</span>
+          </div>
+        </div>
+        <div class="card-proscons">
+          <div class="pros">
+            <h4>Pros</h4>
+            <ul>
+              <li>Industry standard</li>
+              <li>Robust ecosystem</li>
+              <li>Fast inference</li>
+            </ul>
+          </div>
+          <div class="cons">
+            <h4>Cons</h4>
+            <ul>
+              <li>Conservative safety</li>
+              <li>Limited context</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card-footer">
+          <span class="card-date">Reviewed Apr 2026</span>
+          <a href="#" class="read-review">Read Review <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <footer class="footer" id="about">
+    <div class="footer-content">
+      <div class="footer-logo">
+        <span class="logo-dot"></span>
+        LMM.best
+      </div>
+      <p class="footer-text">
+        Independent benchmarking and reviews of Large Multimodal Models.
+        Our methodology combines automated benchmarks with human evaluation.
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    // Animate score bars on scroll
+    const observerOptions = {
+      threshold: 0.2,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const scoreObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const fills = entry.target.querySelectorAll('.score-fill');
+          fills.forEach(fill => {
+            const width = fill.getAttribute('data-width');
+            setTimeout(() => {
+              fill.style.width = width + '%';
+            }, 200);
+          });
+        }
+      });
+    }, observerOptions);
+
+    const leaderboardSection = document.getElementById('leaderboard');
+    if (leaderboardSection) {
+      scoreObserver.observe(leaderboardSection);
+    }
+
+    // Animate cards on scroll
+    const cardObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry, index) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => {
+            entry.target.classList.add('visible');
+          }, index * 100);
+        }
+      });
+    }, observerOptions);
+
+    document.querySelectorAll('.card').forEach(card => {
+      cardObserver.observe(card);
+    });
+  </script>
+</body>
+</html>
