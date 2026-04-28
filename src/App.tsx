@@ -213,6 +213,72 @@ function App() {
           <code style={{ marginTop: '20px' }}>LMM → Text + Images + Audio + Video</code>
           <p>LMMs extend LLMs with perception of other modalities. They can "see" images, "hear" audio, and "understand" video — making them suitable for tasks like image captioning, video analysis, and voice assistants.</p>
         </div>
+
+        <div className="benchmarks-grid" style={{ marginTop: '60px' }}>
+          <div className="benchmark-card" style={{ gridColumn: 'span 2' }}>
+            <div className="benchmark-header">
+              <h3>Any2Any — The Ultimate Goal</h3>
+            </div>
+            <p className="benchmark-desc">
+              <strong>Any2Any</strong> (Any-to-Any) is a <em>functional vision</em> — a system that can receive any combination of modality inputs (text, image, audio, video) and generate any combination of modality outputs. <strong>LMM</strong> is the <em>technical foundation</em> — the most powerful approach currently used to achieve this goal.
+            </p>
+            <div style={{ marginTop: '20px', padding: '15px', background: 'var(--surface-elevated)', borderRadius: '8px' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                    <th style={{ textAlign: 'left', padding: '8px', color: 'var(--accent)' }}>Dimension</th>
+                    <th style={{ textAlign: 'left', padding: '8px', color: 'var(--accent)' }}>LMM</th>
+                    <th style={{ textAlign: 'left', padding: '8px', color: 'var(--accent)' }}>Any2Any</th>
+                  </tr>
+                </thead>
+                <tbody style={{ color: 'var(--text-secondary)' }}>
+                  <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                    <td style={{ padding: '8px' }}>Nature</td>
+                    <td style={{ padding: '8px' }}>Model type / Architecture</td>
+                    <td style={{ padding: '8px' }}>Task capability / Goal scope</td>
+                  </tr>
+                  <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                    <td style={{ padding: '8px' }}>Focus</td>
+                    <td style={{ padding: '8px' }}>Large scale, unified representation</td>
+                    <td style={{ padding: '8px' }}>Input/output flexibility</td>
+                  </tr>
+                  <tr>
+                    <td style={{ padding: '8px' }}>Relationship</td>
+                    <td style={{ padding: '8px' }}>Technical means: provides the "brain"</td>
+                    <td style={{ padding: '8px' }}>Application form: full-range interaction capability</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div className="benchmark-card">
+            <div className="benchmark-header">
+              <h3>NExT-GPT</h3>
+            </div>
+            <p className="benchmark-desc">
+              Considered the first end-to-end Any-to-Any MM-LLM. It can input any combination of text, image, audio, and video, and generate corresponding any-modality output.
+            </p>
+          </div>
+
+          <div className="benchmark-card">
+            <div className="benchmark-header">
+              <h3>GPT-4o</h3>
+            </div>
+            <p className="benchmark-desc">
+              OpenAI's flagship model marking native LMM's march toward more perfect Any2Any experience — unifying audio, visual, and text processing in a single model.
+            </p>
+          </div>
+        </div>
+
+        <div className="scoring-formula" style={{ marginTop: '40px' }}>
+          <h3>Evolution Path</h3>
+          <code>LLM → Basic LMM → Any2Any LMM</code>
+          <p>
+            <strong>Basic LMM</strong>: Focuses on "understanding" — recognizing images, visual Q&A (like early LLaVA).<br/>
+            <strong>Any2Any LMM</strong>: Adds "generation" capability on top of understanding — using decoders like Diffusion models for full modality transformation.
+          </p>
+        </div>
       </section>
 
       <footer className="footer">
