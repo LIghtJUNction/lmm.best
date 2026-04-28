@@ -1,338 +1,330 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
-/* ——— In-view reveal ——— */
+/* ——— Theme ——— */
+function useTheme() {
+  const [t, setT] = useState<'light'|'dark'>(() => {
+    if (typeof window !== 'undefined') {
+      const s = localStorage.getItem('theme')
+      if (s === 'dark' || s === 'light') return s
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+    }
+    return 'light'
+  })
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', t)
+    localStorage.setItem('theme', t)
+  }, [t])
+  return { theme: t, toggle: () => setT(p => p === 'light' ? 'dark' : 'light') }
+}
+
+/* ——— Scroll reveal ——— */
 function useReveal() {
   const ref = useRef<HTMLDivElement>(null)
-  const [visible, setVisible] = useState(false)
+  const [v, setV] = useState(false)
   useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setVisible(true) }, { threshold: 0.15 })
-    obs.observe(el)
-    return () => obs.disconnect()
+    const el = ref.current; if (!el) return
+    const o = new IntersectionObserver(([e]) => { if (e.isIntersecting) setV(true) }, { threshold: 0.05 })
+    o.observe(el); return () => o.disconnect()
   }, [])
-  return { ref, visible }
+  return { ref, visible: v }
 }
 
-function Reveal({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+function Reveal({ children }: { children: React.ReactNode }) {
   const { ref, visible } = useReveal()
-  return <div ref={ref} className={`reveal ${visible ? 'visible' : ''} ${className}`}>{children}</div>
+  return <div ref={ref} className={`reveal ${visible ? 'visible' : ''}`}>{children}</div>
 }
 
-/* ——— Icons ——— */
-const Icons = {
-  ArrowDown: () => (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 5v14M19 12l-7 7-7-7"/>
-    </svg>
-  ),
-  ChevronRight: () => (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M9 18l6-6-6-6"/>
-    </svg>
-  ),
-  Brain: () => (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 4a4 4 0 0 1 4 4c0 1.5-.8 2.8-2 3.5V13h-4v-1.5C8.8 10.8 8 9.5 8 8a4 4 0 0 1 4-4z"/>
-      <path d="M12 13v3M10 16h4M9 4.5A4.5 4.5 0 0 0 4.5 9C3.5 9 3 9.8 3 10.5s.5 1.5 1.5 1.5H6v1a2 2 0 0 0 2 2h1"/>
-      <path d="M15 4.5A4.5 4.5 0 0 1 19.5 9c1 0 1.5.8 1.5 1.5s-.5 1.5-1.5 1.5H18v1a2 2 0 0 1-2 2h-1"/>
-    </svg>
-  ),
-}
+const Sun = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+const Moon = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+const External = () => <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
 
-/* ——— Animated Visualization ——— */
-type Phase = 0 | 1 | 2 | 3 | 4
-type VizModality = { key: string; emoji: string; label: string }
-
-const modalities: VizModality[] = [
-  { key: 'text', emoji: 'Aa', label: 'Text' },
-  { key: 'image', emoji: '🖼', label: 'Image' },
-  { key: 'audio', emoji: '🎵', label: 'Audio' },
-  { key: 'video', emoji: '🎬', label: 'Video' },
+// Model data updated as of April 2026
+const MODELS = [
+  { name:'GPT-5.2', vendor:'OpenAI', params:'~2T (est.)', text:true, image:true, audio:true, video:true, notes:'Omnimodal. Sora 2 video generation integrated. LMSYS #1 overall.' },
+  { name:'Gemini 3.1 Ultra', vendor:'Google', params:'Unknown', text:true, image:true, audio:true, video:true, notes:'20M token context. Veo 3.1 video gen. Native 3D understanding. Deep Think reasoning.' },
+  { name:'Claude Opus 4.6', vendor:'Anthropic', params:'Unknown', text:true, image:true, audio:false, video:false, notes:'Lowest hallucination rate (&lt;4%). Adaptive multi-step reasoning. No audio/video yet.' },
+  { name:'Llama 4 Maverick', vendor:'Meta', params:'400B MoE', text:true, image:true, audio:false, video:false, notes:'MIT open source. MoE architecture. Open weights for research and commercial use.' },
+  { name:'Qwen 3.5', vendor:'Alibaba', params:'397B MoE', text:true, image:true, audio:true, video:true, notes:'3rd-gen MoE. 17B active params. Full multimodal. Open weights.' },
+  { name:'Kimi K2.5', vendor:'Moonshot AI', params:'Unknown', text:true, image:true, audio:true, video:true, notes:'100-agent parallel collaboration. 200K+ char processing. MIT open source.' },
+  { name:'GLM-5.0', vendor:'Zhipu AI', params:'Unknown', text:true, image:true, audio:true, video:true, notes:'SWE-bench 77.8 (open source #1). Full-stack domestic chip adaptation.' },
+  { name:'Muse Spark', vendor:'Meta', params:'Unknown', text:true, image:true, audio:false, video:false, notes:'Visual chain-of-thought. Multi-agent orchestration. Contemplating mode.' },
+  { name:'Gemini Embedding 2', vendor:'Google', params:'—', text:true, image:true, audio:true, video:true, notes:'First native multimodal embedding model. Unifies text+image+audio+video in one vector space.' },
 ]
-
-function ModalityVisualization() {
-  const [phase, setPhase] = useState<Phase>(0)
-  const [isPlaying, setIsPlaying] = useState(false)
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-
-  const advance = useCallback(() => {
-    setPhase(p => {
-      const next = (p + 1) as Phase
-      if (next > 4) { setIsPlaying(false); return p }
-      return next
-    })
-  }, [])
-
-  useEffect(() => {
-    if (!isPlaying) return
-    timerRef.current = setTimeout(advance, 1000)
-    return () => { if (timerRef.current) clearTimeout(timerRef.current) }
-  }, [phase, isPlaying, advance])
-
-  const start = () => { setPhase(0); setIsPlaying(true) }
-
-  const activeCount = phase // phase 0 = 0 active, phase 1 = 1 active, etc.
-  const isLLM = activeCount === 1
-  const isLMM = activeCount >= 2
-
-  return (
-    <div className="viz-section">
-      <h3 className="viz-title">See the Difference</h3>
-      <p className="viz-subtitle">
-        {phase === 0 && 'Press play to see how LMM expands beyond LLM'}
-        {phase === 1 && 'LLM: One modality — text only'}
-        {phase >= 2 && phase < 4 && `LMM: Adding ${modalities[activeCount - 1]?.label}...`}
-        {phase === 4 && 'LMM: All modalities unlocked'}
-      </p>
-
-      <div className="viz-stage">
-        {/* Input modalities */}
-        <div className="viz-modalities">
-          {modalities.map((m, i) => {
-            const isActive = i < activeCount
-            return (
-              <div key={m.key} className={`viz-modality ${isActive ? 'on' : 'off'}`}>
-                <span className="mod-emoji">{m.emoji}</span>
-                <span className="mod-label">{m.label}</span>
-              </div>
-            )
-          })}
-        </div>
-
-        <div className="viz-arrows">
-          <Icons.ChevronRight />
-        </div>
-
-        {/* Model hub */}
-        <div className="viz-model" style={{
-          borderColor: isLMM ? 'rgba(56,189,248,0.5)' : isLLM ? 'rgba(255,255,255,0.15)' : undefined,
-          boxShadow: isLMM ? '0 0 40px rgba(56,189,248,0.12)' : undefined,
-        }}>
-          <Icons.Brain />
-          <span className="viz-model-name">MODEL</span>
-          <span className="viz-model-type">{isLLM ? 'LLM' : isLMM ? 'LMM' : 'AI'}</span>
-        </div>
-
-        <div className="viz-arrows">
-          <Icons.ChevronRight />
-        </div>
-
-        {/* Output modalities (mirror) */}
-        <div className="viz-modalities">
-          {modalities.map((m, i) => {
-            const isActive = i < activeCount
-            return (
-              <div key={m.key} className={`viz-modality ${isActive ? 'on' : 'off'}`}>
-                <span className="mod-emoji">{m.emoji}</span>
-                <span className="mod-label">{m.label}</span>
-              </div>
-            )
-          })}
-        </div>
-      </div>
-
-      <div className="viz-controls">
-        <button className="viz-btn" onClick={start} disabled={isPlaying}>
-          {isPlaying ? 'Running...' : phase > 0 ? 'Replay' : 'Play'}
-        </button>
-      </div>
-
-      <div className="viz-phase-indicator">
-        {[0, 1, 2, 3, 4].map(i => (
-          <div key={i} className={`viz-phase-dot ${i < activeCount || (i === 0 && phase === 0) ? 'active' : ''}`} />
-        ))}
-      </div>
-    </div>
-  )
-}
 
 /* ——— App ——— */
 function App() {
-  const scrollToViz = () => {
-    document.getElementById('viz')?.scrollIntoView({ behavior: 'smooth' })
-  }
+  const { theme, toggle } = useTheme()
 
   return (
     <>
-      {/* Nav */}
-      <nav className="nav">
-        <div className="logo"><span className="logo-dot" />LMM.best</div>
-        <ul className="nav-links">
-          <li><a href="#compare">LLM vs LMM</a></li>
-          <li><a href="#viz">Visualize</a></li>
-          <li><a href="#any2any">Any2Any</a></li>
-        </ul>
+      <nav className="nav" id="nav">
+        <div className="nav-logo">LMM.best</div>
+        <div className="nav-right">
+          <ul className="nav-links">
+            <li><a href="#architecture">Architecture</a></li>
+            <li><a href="#models">Models</a></li>
+            <li><a href="#convergence">Convergence</a></li>
+          </ul>
+          <button className="theme-btn" onClick={toggle} aria-label="Toggle theme">
+            {theme === 'light' ? <Moon /> : <Sun />}
+          </button>
+          <a href="https://github.com" className="nav-gh" target="_blank" rel="noopener">
+            GitHub <External />
+          </a>
+        </div>
       </nav>
 
       {/* Hero */}
-      <section className="hero">
-        <div className="bg-grid" />
-        <div className="bg-orb bg-orb-1" />
-        <div className="bg-orb bg-orb-2" />
-
-        <div className="hero-content">
-          <div className="hero-badge">
-            <span className="hero-badge-dot" />
-            Understanding AI Models
+      <section className="sec sec--hero">
+        <div className="sec-inner">
+          <div className="hero-eyebrow">LLM &rarr; LMM &rarr; Any-to-Any</div>
+          <div className="hero">
+            <h1>LLM <em>&rarr;</em> LMM</h1>
           </div>
-          <h1>LLM <em>vs</em> LMM</h1>
-          <p className="hero-tagline">
-            Large Language Models process text. Large Multimodal Models understand text, images, audio, and video — together.
+          <p className="hero-deck">
+            Text-only transformer architectures have been replaced by omnimodal systems
+            that process text, images, audio, and video through the same attention mechanism.
+            GPT-5.2, Gemini 3.1, and Qwen 3.5 are single unified networks — not pipelines
+            of separate models. As of April 2026, Any-to-Any is no longer a research goal.
+            It's shipping.
           </p>
-          <div className="hero-actions">
-            <button className="btn-primary" onClick={scrollToViz}>
-              See the difference <Icons.ArrowDown />
-            </button>
-            <a href="#compare" className="btn-ghost">Learn more</a>
-          </div>
         </div>
       </section>
 
-      {/* LLM vs LMM Comparison */}
+      {/* Architecture */}
       <Reveal>
-        <section className="section" id="compare">
-          <div className="section-header">
-            <div className="section-label">Core Concepts</div>
-            <h2 className="section-title">LLM vs LMM</h2>
-            <p className="section-subtitle">The difference is simple — LMMs add perception beyond text.</p>
-          </div>
+        <section className="sec sec--alt" id="architecture">
+          <div className="sec-inner">
+            <div className="sec-num">01 &mdash; Architecture</div>
+            <h2 className="sec-title">How the data flows</h2>
+            <p className="sec-deck">
+              The key difference isn't training data — it's the input pipeline.
+              LMMs add modality-specific encoders that project everything into a shared
+              token space. The transformer backbone is modality-agnostic: after projection,
+              a text token, an image patch, and an audio frame are all just vectors.
+            </p>
 
-          <div className="compare-grid">
-            <div className="compare-card llm">
-              <div className="card-icon">Aa</div>
-              <h3 className="card-title">LLM</h3>
-              <span className="card-badge">Language Only</span>
-              <p className="card-desc">
-                A Large Language Model reads and generates text. It can write code, answer questions, and summarize documents — but it cannot see images, hear audio, or watch video.
-              </p>
-              <div className="modality-tags">
-                <span className="modality-tag tag-on">Text</span>
-                <span className="modality-tag tag-off">Image</span>
-                <span className="modality-tag tag-off">Audio</span>
-                <span className="modality-tag tag-off">Video</span>
+            <div className="arch">
+              <div className="arch-col">
+                <div className="arch-col-head">
+                  <span className="arch-col-label">Language Model (2020)</span>
+                  <span className="arch-col-name">LLM</span>
+                </div>
+                <div className="arch-flow">
+                  <div className="arch-flow-item">Tokenizer &rarr; token IDs</div>
+                  <div className="arch-flow-arrow">&darr;</div>
+                  <div className="arch-flow-item">Token Embedding</div>
+                  <div className="arch-flow-arrow">&darr;</div>
+                  <div className="arch-flow-item arch-flow-item--hl">Transformer Blocks</div>
+                  <div className="arch-flow-arrow">&darr;</div>
+                  <div className="arch-flow-item">LM Head &rarr; next-token logits</div>
+                </div>
+                <div className="arch-note">
+                  <strong>Input:</strong> text tokens only.<br/>
+                  <strong>Output:</strong> text. One modality, one direction.
+                </div>
+                <div className="arch-models">
+                  <span className="arch-model">GPT-3</span>
+                  <span className="arch-model">LLaMA 2</span>
+                  <span className="arch-model">PaLM</span>
+                </div>
               </div>
-            </div>
 
-            <div className="compare-card lmm">
-              <div className="card-icon">◈</div>
-              <h3 className="card-title">LMM</h3>
-              <span className="card-badge">Multimodal</span>
-              <p className="card-desc">
-                A Large Multimodal Model extends text understanding with visual and audio perception. It can analyze a chart, describe a photo, transcribe speech, or summarize a video — all within one model.
-              </p>
-              <div className="modality-tags">
-                <span className="modality-tag tag-on">Text</span>
-                <span className="modality-tag tag-on">Image</span>
-                <span className="modality-tag tag-on">Audio</span>
-                <span className="modality-tag tag-on">Video</span>
+              <div className="arch-col">
+                <div className="arch-col-head">
+                  <span className="arch-col-label">Multimodal Model (2026)</span>
+                  <span className="arch-col-name">LMM</span>
+                </div>
+                <div className="arch-flow">
+                  <div className="arch-flow-item arch-flow-item--dim">Text: Tokenizer &rarr; token IDs</div>
+                  <div className="arch-flow-item">Image: ViT &rarr; patch embeddings</div>
+                  <div className="arch-flow-item">Audio: Whisper-style encoder &rarr; frame embeddings</div>
+                  <div className="arch-flow-item">Video: spatial-temporal patches &rarr; sequence embeddings</div>
+                  <div className="arch-flow-arrow">&darr;</div>
+                  <div className="arch-flow-item">Projection &rarr; unified token space (R<sup>d</sup>)</div>
+                  <div className="arch-flow-arrow">&darr;</div>
+                  <div className="arch-flow-item arch-flow-item--hl">Omnimodal Transformer</div>
+                  <div className="arch-flow-arrow">&darr;</div>
+                  <div className="arch-flow-item">Multimodal Output Heads</div>
+                </div>
+                <div className="arch-note">
+                  <strong>Input:</strong> interleaved tokens from any modality.<br/>
+                  <strong>Output:</strong> text, image, audio, or video tokens from shared vocabulary.<br/>
+                  <strong>Key:</strong> after projection, everything is just a vector.
+                </div>
+                <div className="arch-models">
+                  <span className="arch-model">GPT-5.2</span>
+                  <span className="arch-model">Gemini 3.1</span>
+                  <span className="arch-model">Qwen 3.5</span>
+                  <span className="arch-model">Kimi K2.5</span>
+                </div>
               </div>
             </div>
           </div>
         </section>
       </Reveal>
 
-      {/* Interactive Visualization */}
+      {/* Models */}
       <Reveal>
-        <section className="section" id="viz">
-          <div className="section-header">
-            <div className="section-label">Interactive</div>
-            <h2 className="section-title">Watch the Difference</h2>
-            <p className="section-subtitle">Play the animation to see how modalities expand from LLM to LMM.</p>
+        <section className="sec" id="models">
+          <div className="sec-inner">
+            <div className="sec-num">02 &mdash; The Models</div>
+            <h2 className="sec-title">Who's shipping multimodal</h2>
+            <p className="models-intro">
+              As of April 2026, all major labs ship multimodal models. The architecture has
+              converged — differences are in modality coverage, context window, and whether
+              weights are open. Chinese labs (Zhipu, Alibaba, Moonshot) now lead in open-source
+              multimodal, surpassing US models on several benchmarks.
+            </p>
+
+            <table className="models-table">
+              <thead>
+                <tr>
+                  <th>Model</th>
+                  <th>Lab</th>
+                  <th>Params</th>
+                  <th>T</th>
+                  <th>I</th>
+                  <th>A</th>
+                  <th>V</th>
+                  <th style={{minWidth:280}}>Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                {MODELS.map(m => (
+                  <tr key={m.name}>
+                    <td>{m.name}</td>
+                    <td><span className="vendor">{m.vendor}</span></td>
+                    <td><span className="params">{m.params}</span></td>
+                    <td><span className="check">&check;</span></td>
+                    <td>{m.image ? <span className="check">&check;</span> : <span className="cross">&mdash;</span>}</td>
+                    <td>{m.audio ? <span className="check">&check;</span> : <span className="cross">&mdash;</span>}</td>
+                    <td>{m.video ? <span className="check">&check;</span> : <span className="cross">&mdash;</span>}</td>
+                    <td style={{fontSize:'0.78rem'}}>{m.notes}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            <p className="models-source">
+              As of April 2026. Chinese models now exceed 5.16 trillion weekly API calls vs US 2.7 trillion. &rarr;{' '}
+              <a href="https://artificialanalysis.ai" target="_blank" rel="noopener">Artificial Analysis</a>
+              {' '}for live benchmarks.
+            </p>
           </div>
-          <ModalityVisualization />
         </section>
       </Reveal>
 
-      {/* Any2Any */}
+      {/* Convergence */}
       <Reveal>
-        <section className="section" id="any2any">
-          <div className="section-header">
-            <div className="section-label">Beyond LMM</div>
-            <h2 className="section-title">Any2Any</h2>
-            <p className="section-subtitle">The ultimate vision — LMM is the technical foundation to achieve it.</p>
-          </div>
+        <section className="sec sec--alt" id="convergence">
+          <div className="sec-inner sec-inner--narrow">
+            <div className="sec-num">03 &mdash; The Convergence</div>
+            <h2 className="sec-title">One architecture, all modalities</h2>
 
-          <div className="any2any-grid">
-            <div className="info-card full-width">
-              <div className="info-card-icon">∞</div>
-              <h3>LMM x Any2Any</h3>
+            <div className="converge-text">
               <p>
-                <strong>Any2Any</strong> is a <em>functional vision</em>: a system that accepts any combination of modalities as input and produces any combination as output. <strong>LMM</strong> is the <em>technical foundation</em> — the most powerful approach we have today to realize that vision.
+                <strong>The convergence is complete.</strong> In 2020, GPT-3 (text), ViT (vision),
+                and Wav2Vec (audio) were three separate architectures. By 2023, LLaVA and GPT-4V
+                connected a frozen ViT to a frozen LLM via a projection layer — the one-way bridge.
+                By late 2025, the separation dissolved. GPT-5.2 processes text, images, audio, and
+                video (via Sora 2) in a single end-to-end network. Gemini 3.1 adds 3D understanding
+                and a 20-million-token context window. Qwen 3.5 and Kimi K2.5 are open-weight
+                models with full multimodal parity.
               </p>
-              <table className="compare-table">
-                <thead>
-                  <tr><th>Dimension</th><th>LMM</th><th>Any2Any</th></tr>
-                </thead>
-                <tbody>
-                  <tr><td>Nature</td><td>Model type / Architecture</td><td>Task capability / Goal</td></tr>
-                  <tr><td>Focus</td><td>Scale, unified representation</td><td>Input / output flexibility</td></tr>
-                  <tr><td>Role</td><td>Technical means — the "brain"</td><td>Application form — full interaction</td></tr>
-                </tbody>
-              </table>
+
+              <p>
+                <strong>MoE changed the economics.</strong> Llama 4 Maverick has 400B total
+                parameters but only activates a fraction per token. Qwen 3.5: 397B total, 17B active.
+                This means multimodal inference at interactive speeds — under 500ms — with costs
+                down 60-90% from 2024. Real-time voice + vision interaction is GA on Vertex AI
+                (Gemini Live API) and through GPT-4o's realtime endpoint.
+              </p>
+
+              <div className="converge-block">
+                <p>
+                  "The transformer is modality-agnostic. After projection, a text token, an image
+                  patch, and an audio frame are all vectors in R<sup>d</sup>. The attention
+                  mechanism doesn't care where they came from. The bottleneck was never the
+                  architecture — it was the encoders and the data. Both are solved now."
+                </p>
+              </div>
+
+              <p>
+                <strong>What's next.</strong> The remaining frontier is generative quality across
+                all modalities at once. GPT-5.2 with Sora 2 and Gemini 3.1 with Veo 3.1 can produce
+                coherent video from text prompts, but seamless interleaved generation — producing a
+                document where text paragraphs, diagrams, and video clips are all generated in a
+                single unified pass — is still being refined. Google's Gemini Embedding 2 (March 2026)
+                is the first model to unify text, image, audio, and video in a single embedding space,
+                enabling true multimodal RAG. When generation catches up to understanding across all
+                modalities simultaneously, the distinction between "text model," "image model," and
+                "audio model" disappears entirely. There's just the model.
+              </p>
             </div>
 
-            <div className="info-card">
-              <div className="info-card-icon">🔬</div>
-              <h3>NExT-GPT</h3>
-              <p>The first end-to-end Any-to-Any MM-LLM. Accepts any combination of text, image, audio, and video, and generates any-modality output through integrated diffusion decoders.</p>
+            {/* Capability comparison */}
+            <div className="cap-grid">
+              <div className="cap-col">
+                <div className="cap-col-head">LLM<br/>2020</div>
+                <div className="cap-col-body">
+                  <div className="cap-row"><span className="yes">&#10003;</span> Text &rarr; Text</div>
+                  <div className="cap-row"><span className="no">&#10005;</span> Image &rarr; Text</div>
+                  <div className="cap-row"><span className="no">&#10005;</span> Audio &rarr; Text</div>
+                  <div className="cap-row"><span className="no">&#10005;</span> Text &rarr; Image</div>
+                  <div className="cap-row"><span className="no">&#10005;</span> Any &rarr; Any</div>
+                </div>
+              </div>
+              <div className="cap-col">
+                <div className="cap-col-head">Early LMM<br/>2023</div>
+                <div className="cap-col-body">
+                  <div className="cap-row"><span className="yes">&#10003;</span> Text &rarr; Text</div>
+                  <div className="cap-row"><span className="yes">&#10003;</span> Image &rarr; Text</div>
+                  <div className="cap-row"><span className="no">&#10005;</span> Audio &rarr; Text</div>
+                  <div className="cap-row"><span className="no">&#10005;</span> Text &rarr; Image</div>
+                  <div className="cap-row"><span className="no">&#10005;</span> Any &rarr; Any</div>
+                </div>
+              </div>
+              <div className="cap-col">
+                <div className="cap-col-head">Native LMM<br/>2025</div>
+                <div className="cap-col-body">
+                  <div className="cap-row"><span className="yes">&#10003;</span> Text &rarr; Text</div>
+                  <div className="cap-row"><span className="yes">&#10003;</span> Image &rarr; Text</div>
+                  <div className="cap-row"><span className="yes">&#10003;</span> Audio &rarr; Text</div>
+                  <div className="cap-row"><span className="yes">&#10003;</span> Text &rarr; Image</div>
+                  <div className="cap-row"><span className="no">&#10005;</span> Any &rarr; Any</div>
+                </div>
+              </div>
+              <div className="cap-col">
+                <div className="cap-col-head">Any2Any<br/>2026</div>
+                <div className="cap-col-body">
+                  <div className="cap-row"><span className="yes">&#10003;</span> Text &rarr; Text</div>
+                  <div className="cap-row"><span className="yes">&#10003;</span> Image &rarr; Text</div>
+                  <div className="cap-row"><span className="yes">&#10003;</span> Audio &rarr; Text</div>
+                  <div className="cap-row"><span className="yes">&#10003;</span> Text &rarr; Image</div>
+                  <div className="cap-row"><span className="yes">&#10003;</span> Any &rarr; Any</div>
+                </div>
+              </div>
             </div>
 
-            <div className="info-card">
-              <div className="info-card-icon">⚡</div>
-              <h3>GPT-4o</h3>
-              <p>OpenAI's flagship natively unifying audio, visual, and text processing in a single model — a major step toward seamless Any2Any interaction.</p>
-            </div>
+            <p className="models-source" style={{marginTop:'1.5rem'}}>
+              Any-to-Any is no longer research. GPT-5.2 + Sora 2, Gemini 3.1 + Veo 3.1, and Qwen 3.5
+              all support at least 4 input modalities and 3+ output modalities in production as of
+              April 2026. See{' '}
+              <a href="https://artificialanalysis.ai" target="_blank" rel="noopener">Artificial Analysis</a>
+              {' '}for up-to-date benchmarks.
+            </p>
           </div>
         </section>
       </Reveal>
 
-      {/* Evolution */}
-      <Reveal>
-        <section className="section evo-section">
-          <div className="section-header">
-            <div className="section-label">Evolution</div>
-            <h2 className="section-title">The Path Forward</h2>
-            <p className="section-subtitle" style={{margin:'0 auto'}}>From text-only models to full multimodal understanding.</p>
-          </div>
-
-          <div className="evo-path">
-            <div className="evo-step">
-              <div className="evo-step-icon">Aa</div>
-              <h4>LLM</h4>
-              <p>Text only</p>
-            </div>
-            <span className="evo-arrow">→</span>
-            <div className="evo-step">
-              <div className="evo-step-icon">◈</div>
-              <h4>Basic LMM</h4>
-              <p>Understanding</p>
-            </div>
-            <span className="evo-arrow">→</span>
-            <div className="evo-step">
-              <div className="evo-step-icon">∞</div>
-              <h4>Any2Any LMM</h4>
-              <p>Full generation</p>
-            </div>
-          </div>
-
-          <div className="evo-detail">
-            <div className="evo-detail-card">
-              <h4>Basic LMM — Understanding</h4>
-              <p>Focuses on perception: recognizing images, answering visual questions, captioning photos. Early models like LLaVA pioneered this — input multiple modalities, but output only text.</p>
-            </div>
-            <div className="evo-detail-card">
-              <h4>Any2Any LMM — Generation</h4>
-              <p>Adds generation on top of understanding. Uses diffusion decoders or native multimodal output heads to produce images, audio, and video — not just text — from any input combination.</p>
-            </div>
-          </div>
-        </section>
-      </Reveal>
-
-      {/* Footer */}
       <footer className="footer">
-        <div className="footer-logo"><span className="logo-dot" />LMM.best</div>
-        <p className="footer-text">LMM = Large Multimodal Model</p>
+        <span className="footer-text">LMM.best &mdash; Tracking the multimodal convergence. Updated April 2026.</span>
+        <div className="footer-links">
+          <a href="#architecture">Architecture</a>
+          <a href="#models">Models</a>
+          <a href="#convergence">Convergence</a>
+        </div>
       </footer>
     </>
   )
