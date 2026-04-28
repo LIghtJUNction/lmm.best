@@ -2,7 +2,7 @@
 
 ## Concept & Vision
 
-LMM.best is an informational domain about Large Multimodal Models (LMMs). The site introduces visitors to what LMMs are, who the current leaders are, and communicates that this domain is evolving toward a new purpose. The aesthetic remains premium and editorial — a refined, authoritative presence that feels like a premium tech publication.
+LMM.best is an informational domain explaining the difference between LLMs (Large Language Models) and LMMs (Large Multimodal Models). It features an interactive animation demonstrating how LMMs add multimodal capabilities (image, audio, video) on top of text-only LLM foundations.
 
 ## Design Language
 
@@ -25,37 +25,48 @@ LMM.best is an informational domain about Large Multimodal Models (LMMs). The si
 
 **Spatial System**: Generous whitespace, asymmetric layouts, content breathes.
 
-**Motion Philosophy**: Subtle, refined. Page load has staggered reveals. Hover states are smooth (200-300ms). Nothing bouncy or playful — everything feels precise and intentional.
+**Motion Philosophy**: Subtle, refined. Page load has staggered reveals. Hover states are smooth (200-300ms). Animation progresses in phases showing modality expansion.
 
 **Visual Assets**:
-- Lucide icons (thin stroke weight)
+- Canvas-based interactive animation
 - Abstract geometric patterns as decorative elements
 - Subtle grain texture overlay for depth
 
 ## Layout & Structure
 
-1. **Navigation**: Minimal top bar with logo and "About" link
-2. **Hero Section**: Full-viewport with large serif headline, tagline, subtle geometric accents
-3. **About Section**: Card grid explaining LMMs, current leaders, future direction, and the question of "which is best"
-4. **Footer**: Minimal, refined
+1. **Navigation**: Minimal top bar with logo and "LLM vs LMM" link
+2. **Hero Section**: Full-viewport with large serif headline explaining the purpose
+3. **LLM vs LMM Section**: Two comparison cards + interactive animation demonstrating modality expansion
+4. **Key Difference Section**: Side-by-side comparison of LLM and LMM capabilities
+5. **Footer**: Minimal, refined
+
+## Animation
+
+Interactive 5-phase animation showing modality expansion:
+1. **Phase 0**: Text box appears (LLM)
+2. **Phase 1**: Text labeled as "LLM"
+3. **Phase 2**: Image box appears
+4. **Phase 3**: Audio box appears, connection lines drawn
+5. **Phase 4**: Video box appears
+6. **Phase 5**: "LMM = LLM + Multimodal" label
+
+Labels below canvas track progress: "Text Only" → "+ Images" → "+ Audio" → "+ Video" → "Complete LMM"
 
 ## Content
 
 ### Hero
-- Eyebrow: "One Domain, Many Possibilities"
-- Headline: "What is LMM.best"
-- Tagline: "A domain dedicated to Large Multimodal Models — past, present, and future."
+- Eyebrow: "Understanding AI Models"
+- Headline: "LLM vs LMM"
+- Tagline: "What's the difference? Click play to see."
 
-### About Section Cards
-1. **What is LMM?** - Definition of Large Multimodal Models
-2. **Current Leaders** - Overview of top models (GPT-4o, Claude 3.5 Sonnet, Gemini 1.5 Pro, Qwen2.5-VL)
-3. **Future Direction** - Domain is evolving, exact destination TBD
-4. **Which LMM is Best?** - No single best answer, depends on use case
+### Comparison Cards
+1. **LLM — Language Only** — Text processing only
+2. **LMM — Multimodal** — Text + Image + Audio + Video
 
-### Footer
-- Logo
-- Tagline: "A domain for the LMM community"
+### Key Difference Section
+- LLM: Text only, powerful text processing
+- LMM: Adds image, audio, video perception to text
 
 ## Technical Approach
 
-React 19 + TypeScript + Vite SPA. Single-page application with static content cards.
+React 19 + TypeScript + Vite SPA. Canvas-based animation with phase-based rendering. CSS animations for UI elements.
