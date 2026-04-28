@@ -2,11 +2,11 @@
 
 ## Concept & Vision
 
-A refined, editorial-style ranking site for Large Multimodal Models that feels like a premium tech publication rather than another generic AI listing page. The aesthetic draws from high-end automotive reviews and luxury magazine layouts — authoritative, sophisticated, and memorable. Dark theme with warm amber accents creates a distinctive presence that stands apart from typical blue/purple AI sites.
+LMM.best is an informational domain about Large Multimodal Models (LMMs). The site introduces visitors to what LMMs are, who the current leaders are, and communicates that this domain is evolving toward a new purpose. The aesthetic remains premium and editorial — a refined, authoritative presence that feels like a premium tech publication.
 
 ## Design Language
 
-**Aesthetic Direction**: Editorial luxury meets tech benchmark — think Car & Driver meets a refined research publication.
+**Aesthetic Direction**: Editorial luxury meets tech — think Car & Driver meets a refined research publication.
 
 **Color Palette**:
 - Background: `#0a0a0a` (near-black)
@@ -17,14 +17,11 @@ A refined, editorial-style ranking site for Large Multimodal Models that feels l
 - Accent: `#d4a574` (warm amber/gold)
 - Accent Secondary: `#8b7355` (muted bronze)
 - Border: `#2a2a2a` (subtle dividers)
-- Tier S: `#ffd700` (gold)
-- Tier A: `#c0c0c0` (silver)
-- Tier B: `#cd7f32` (bronze)
 
 **Typography**:
 - Display: "Playfair Display" (serif, for hero and section titles)
 - Body: "DM Sans" (clean geometric sans)
-- Monospace: "JetBrains Mono" (for specs/model names)
+- Monospace: "JetBrains Mono" (for code snippets)
 
 **Spatial System**: Generous whitespace, asymmetric layouts, content breathes.
 
@@ -37,46 +34,28 @@ A refined, editorial-style ranking site for Large Multimodal Models that feels l
 
 ## Layout & Structure
 
-1. **Navigation**: Minimal top bar with logo and key links
+1. **Navigation**: Minimal top bar with logo and "About" link
 2. **Hero Section**: Full-viewport with large serif headline, tagline, subtle geometric accents
-3. **Leaderboard Section**: Magazine-style ranking table with tier badges, scores, and key metrics
-4. **Model Cards Grid**: Individual model review cards with specs, pros/cons, and ratings
-5. **Footer**: Minimal, refined
+3. **About Section**: Card grid explaining LMMs, current leaders, future direction, and the question of "which is best"
+4. **Footer**: Minimal, refined
 
-## Features & Interactions
-
-- Smooth scroll navigation
-- Tier badge system (S/A/B/C tiers)
-- Score bars with animated fill
-- Model cards with hover lift effect
-- Responsive: works on mobile and desktop
-
-## Component Inventory
-
-### Navigation
-- Logo (text-based, distinctive)
-- Minimal links
-- Sticky on scroll with backdrop blur
+## Content
 
 ### Hero
-- Large serif headline
-- Tagline in secondary text
-- Decorative geometric element
+- Eyebrow: "One Domain, Many Possibilities"
+- Headline: "What is LMM.best"
+- Tagline: "A domain dedicated to Large Multimodal Models — past, present, and future."
 
-### Leaderboard Table
-- Rank number (large, monospace)
-- Model name with tier badge
-- Score bar (animated)
-- Key metrics: Parameters, Context Window, Multimodal Score
-- Hover row highlight
+### About Section Cards
+1. **What is LMM?** - Definition of Large Multimodal Models
+2. **Current Leaders** - Overview of top models (GPT-4o, Claude 3.5 Sonnet, Gemini 1.5 Pro, Qwen2.5-VL)
+3. **Future Direction** - Domain is evolving, exact destination TBD
+4. **Which LMM is Best?** - No single best answer, depends on use case
 
-### Model Review Card
-- Model name + tier badge
-- Key specifications
-- Star rating
-- Pros/Cons list
-- "Read Review" link
+### Footer
+- Logo
+- Tagline: "A domain for the LMM community"
 
 ## Technical Approach
 
-Single HTML file with embedded CSS and vanilla JavaScript. No framework needed for this scope. All styles use CSS custom properties for consistency.
+React 19 + TypeScript + Vite SPA. Single-page application with static content cards.

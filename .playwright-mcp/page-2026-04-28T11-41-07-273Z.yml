@@ -1,0 +1,40 @@
+- generic [ref=e2]:
+  - navigation [ref=e3]:
+    - generic [ref=e4]: LMM.best
+    - list [ref=e6]:
+      - listitem [ref=e7]:
+        - link "About" [ref=e8] [cursor=pointer]:
+          - /url: "#about"
+  - generic [ref=e9]:
+    - generic [ref=e10]:
+      - generic [ref=e11]: One Domain, Many Possibilities
+      - heading "What is LMM.best" [level=1] [ref=e12]:
+        - text: What is
+        - emphasis [ref=e13]: LMM.best
+      - paragraph [ref=e14]: A domain dedicated to Large Multimodal Models — past, present, and future.
+    - img [ref=e16]
+  - generic [ref=e20]:
+    - generic [ref=e22]:
+      - heading "About This Domain" [level=2] [ref=e23]
+      - paragraph [ref=e24]: Your gateway to understanding Large Multimodal Models
+    - generic [ref=e25]:
+      - generic [ref=e26]:
+        - heading "What is LMM?" [level=3] [ref=e28]
+        - paragraph [ref=e29]: Large Multimodal Models (LMMs) are AI systems that can understand and process multiple types of data — text, images, audio, and video. Unlike traditional language models, LMMs can see, hear, and reason across modalities.
+      - generic [ref=e30]:
+        - heading "Current Leaders" [level=3] [ref=e32]
+        - paragraph [ref=e33]: The most capable LMMs in 2026 include GPT-4o, Claude 3.5 Sonnet, Gemini 1.5 Pro, and Qwen2.5-VL. Each excels at different tasks — some are better at reasoning, others at vision or speed.
+      - generic [ref=e34]:
+        - heading "Future Direction" [level=3] [ref=e36]
+        - paragraph [ref=e37]: LMM.best is evolving. This domain will point to a curated collection of resources, comparisons, or a new project focused on the LMM ecosystem. The exact destination is being decided.
+      - generic [ref=e38]:
+        - heading "Which LMM is Best?" [level=3] [ref=e40]
+        - paragraph [ref=e41]: There is no single "best" LMM — it depends on your needs. For general reasoning, Claude 3.5 Sonnet leads. For coding, GPT-4o excels. For multilingual vision tasks, Qwen models are outstanding. The right choice depends on your specific use case.
+    - generic [ref=e42]:
+      - heading "The LMM Landscape" [level=3] [ref=e43]
+      - code [ref=e44]: LMM = Large Multimodal Model
+      - paragraph [ref=e45]: LMMs represent the next frontier of AI — models that can perceive and understand the world across multiple modalities, enabling applications from autonomous vehicles to medical diagnosis to creative tools.
+  - contentinfo [ref=e46]:
+    - generic [ref=e47]:
+      - generic [ref=e48]: LMM.best
+      - paragraph [ref=e50]: A domain for the LMM community
