@@ -1,296 +1,338 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 
-function LLMvsLMMAnimation() {
-  const [phase, setPhase] = useState(0)
+/* ——— In-view reveal ——— */
+function useReveal() {
+  const ref = useRef<HTMLDivElement>(null)
+  const [visible, setVisible] = useState(false)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setVisible(true) }, { threshold: 0.15 })
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [])
+  return { ref, visible }
+}
+
+function Reveal({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+  const { ref, visible } = useReveal()
+  return <div ref={ref} className={`reveal ${visible ? 'visible' : ''} ${className}`}>{children}</div>
+}
+
+/* ——— Icons ——— */
+const Icons = {
+  ArrowDown: () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 5v14M19 12l-7 7-7-7"/>
+    </svg>
+  ),
+  ChevronRight: () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9 18l6-6-6-6"/>
+    </svg>
+  ),
+  Brain: () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 4a4 4 0 0 1 4 4c0 1.5-.8 2.8-2 3.5V13h-4v-1.5C8.8 10.8 8 9.5 8 8a4 4 0 0 1 4-4z"/>
+      <path d="M12 13v3M10 16h4M9 4.5A4.5 4.5 0 0 0 4.5 9C3.5 9 3 9.8 3 10.5s.5 1.5 1.5 1.5H6v1a2 2 0 0 0 2 2h1"/>
+      <path d="M15 4.5A4.5 4.5 0 0 1 19.5 9c1 0 1.5.8 1.5 1.5s-.5 1.5-1.5 1.5H18v1a2 2 0 0 1-2 2h-1"/>
+    </svg>
+  ),
+}
+
+/* ——— Animated Visualization ——— */
+type Phase = 0 | 1 | 2 | 3 | 4
+type VizModality = { key: string; emoji: string; label: string }
+
+const modalities: VizModality[] = [
+  { key: 'text', emoji: 'Aa', label: 'Text' },
+  { key: 'image', emoji: '🖼', label: 'Image' },
+  { key: 'audio', emoji: '🎵', label: 'Audio' },
+  { key: 'video', emoji: '🎬', label: 'Video' },
+]
+
+function ModalityVisualization() {
+  const [phase, setPhase] = useState<Phase>(0)
   const [isPlaying, setIsPlaying] = useState(false)
-  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const advance = useCallback(() => {
+    setPhase(p => {
+      const next = (p + 1) as Phase
+      if (next > 4) { setIsPlaying(false); return p }
+      return next
+    })
+  }, [])
 
   useEffect(() => {
     if (!isPlaying) return
-    if (phase > 5) {
-      setIsPlaying(false)
-      return
-    }
-    const timer = setTimeout(() => setPhase(p => p + 1), 1200)
-    return () => clearTimeout(timer)
-  }, [phase, isPlaying])
+    timerRef.current = setTimeout(advance, 1000)
+    return () => { if (timerRef.current) clearTimeout(timerRef.current) }
+  }, [phase, isPlaying, advance])
 
-  useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
+  const start = () => { setPhase(0); setIsPlaying(true) }
 
-    const w = canvas.width
-    const h = canvas.height
-    ctx.clearRect(0, 0, w, h)
-
-    // Text box (always visible)
-    const textX = 100, textY = h/2 - 30, textW = 160, textH = 60
-    ctx.strokeStyle = phase >= 1 ? '#d4a574' : '#555'
-    ctx.lineWidth = 2
-    ctx.beginPath()
-    ctx.roundRect(textX, textY, textW, textH, 8)
-    ctx.stroke()
-    ctx.fillStyle = '#1a1a1a'
-    ctx.fillRect(textX, textY, textW, textH)
-    ctx.fillStyle = phase >= 1 ? '#d4a574' : '#888'
-    ctx.font = '14px JetBrains Mono'
-    ctx.textAlign = 'center'
-    ctx.fillText('TEXT', textX + textW/2, textY + textH/2 + 5)
-
-    // Image box (appears at phase 2+)
-    if (phase >= 2) {
-      const imgX = w/2 - 80, imgY = h/2 - 30, imgW = 160, imgH = 60
-      const alpha = phase >= 2 ? 1 : 0
-      ctx.strokeStyle = '#d4a574'
-      ctx.globalAlpha = alpha
-      ctx.beginPath()
-      ctx.roundRect(imgX, imgY, imgW, imgH, 8)
-      ctx.stroke()
-      ctx.fillStyle = '#1a1a1a'
-      ctx.fillRect(imgX, imgY, imgW, imgH)
-      ctx.fillStyle = '#d4a574'
-      ctx.font = '14px JetBrains Mono'
-      ctx.fillText('IMAGE', imgX + imgW/2, imgY + imgH/2 + 5)
-      ctx.globalAlpha = 1
-    }
-
-    // Audio box (appears at phase 3+)
-    if (phase >= 3) {
-      const audX = 100, audY = h/2 + 50, audW = 160, audH = 60
-      ctx.strokeStyle = '#d4a574'
-      ctx.beginPath()
-      ctx.roundRect(audX, audY, audW, audH, 8)
-      ctx.stroke()
-      ctx.fillStyle = '#1a1a1a'
-      ctx.fillRect(audX, audY, audW, audH)
-      ctx.fillStyle = '#d4a574'
-      ctx.font = '14px JetBrains Mono'
-      ctx.fillText('AUDIO', audX + audW/2, audY + audH/2 + 5)
-    }
-
-    // Video box (appears at phase 4+)
-    if (phase >= 4) {
-      const vidX = w/2 - 80, vidY = h/2 + 50, vidW = 160, vidH = 60
-      ctx.strokeStyle = '#d4a574'
-      ctx.beginPath()
-      ctx.roundRect(vidX, vidY, vidW, vidH, 8)
-      ctx.stroke()
-      ctx.fillStyle = '#1a1a1a'
-      ctx.fillRect(vidX, vidY, vidW, vidH)
-      ctx.fillStyle = '#d4a574'
-      ctx.font = '14px JetBrains Mono'
-      ctx.fillText('VIDEO', vidX + vidW/2, vidY + vidH/2 + 5)
-    }
-
-    // Connection lines (phase 3+)
-    if (phase >= 3) {
-      ctx.strokeStyle = '#d4a574'
-      ctx.lineWidth = 1
-      ctx.setLineDash([4, 4])
-      ctx.beginPath()
-      ctx.moveTo(textX + textW/2, textY + textH)
-      ctx.lineTo(textX + textW/2, textY + textH + 20)
-      ctx.stroke()
-      ctx.setLineDash([])
-    }
-
-    // LLM label
-    if (phase === 1) {
-      ctx.fillStyle = '#888'
-      ctx.font = '12px DM Sans'
-      ctx.textAlign = 'center'
-      ctx.fillText('LLM', textX + textW/2, textY - 15)
-    }
-
-    // LMM label
-    if (phase >= 5) {
-      ctx.fillStyle = '#d4a574'
-      ctx.font = 'bold 14px DM Sans'
-      ctx.textAlign = 'center'
-      ctx.fillText('LMM = LLM + Multimodal', w/2, h - 30)
-    }
-
-  }, [phase])
-
-  const labels = ['Text Only', '+ Images', '+ Audio', '+ Video', 'Complete LMM']
+  const activeCount = phase // phase 0 = 0 active, phase 1 = 1 active, etc.
+  const isLLM = activeCount === 1
+  const isLMM = activeCount >= 2
 
   return (
-    <div className="animation-container">
-      <canvas ref={canvasRef} width={400} height={200} />
-      <div className="animation-controls">
-        <button onClick={() => { setPhase(0); setIsPlaying(true) }} className="play-btn">
-          {isPlaying ? '▶ Playing...' : '▶ Play Animation'}
+    <div className="viz-section">
+      <h3 className="viz-title">See the Difference</h3>
+      <p className="viz-subtitle">
+        {phase === 0 && 'Press play to see how LMM expands beyond LLM'}
+        {phase === 1 && 'LLM: One modality — text only'}
+        {phase >= 2 && phase < 4 && `LMM: Adding ${modalities[activeCount - 1]?.label}...`}
+        {phase === 4 && 'LMM: All modalities unlocked'}
+      </p>
+
+      <div className="viz-stage">
+        {/* Input modalities */}
+        <div className="viz-modalities">
+          {modalities.map((m, i) => {
+            const isActive = i < activeCount
+            return (
+              <div key={m.key} className={`viz-modality ${isActive ? 'on' : 'off'}`}>
+                <span className="mod-emoji">{m.emoji}</span>
+                <span className="mod-label">{m.label}</span>
+              </div>
+            )
+          })}
+        </div>
+
+        <div className="viz-arrows">
+          <Icons.ChevronRight />
+        </div>
+
+        {/* Model hub */}
+        <div className="viz-model" style={{
+          borderColor: isLMM ? 'rgba(56,189,248,0.5)' : isLLM ? 'rgba(255,255,255,0.15)' : undefined,
+          boxShadow: isLMM ? '0 0 40px rgba(56,189,248,0.12)' : undefined,
+        }}>
+          <Icons.Brain />
+          <span className="viz-model-name">MODEL</span>
+          <span className="viz-model-type">{isLLM ? 'LLM' : isLMM ? 'LMM' : 'AI'}</span>
+        </div>
+
+        <div className="viz-arrows">
+          <Icons.ChevronRight />
+        </div>
+
+        {/* Output modalities (mirror) */}
+        <div className="viz-modalities">
+          {modalities.map((m, i) => {
+            const isActive = i < activeCount
+            return (
+              <div key={m.key} className={`viz-modality ${isActive ? 'on' : 'off'}`}>
+                <span className="mod-emoji">{m.emoji}</span>
+                <span className="mod-label">{m.label}</span>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+
+      <div className="viz-controls">
+        <button className="viz-btn" onClick={start} disabled={isPlaying}>
+          {isPlaying ? 'Running...' : phase > 0 ? 'Replay' : 'Play'}
         </button>
       </div>
-      <div className="animation-labels">
-        {labels.map((label, i) => (
-          <span key={i} className={`label ${phase >= i + 1 ? 'active' : ''}`}>{label}</span>
+
+      <div className="viz-phase-indicator">
+        {[0, 1, 2, 3, 4].map(i => (
+          <div key={i} className={`viz-phase-dot ${i < activeCount || (i === 0 && phase === 0) ? 'active' : ''}`} />
         ))}
       </div>
     </div>
   )
 }
 
+/* ——— App ——— */
 function App() {
+  const scrollToViz = () => {
+    document.getElementById('viz')?.scrollIntoView({ behavior: 'smooth' })
+  }
+
   return (
     <>
+      {/* Nav */}
       <nav className="nav">
-        <div className="logo">
-          <span className="logo-dot"></span>
-          LMM.best
-        </div>
+        <div className="logo"><span className="logo-dot" />LMM.best</div>
         <ul className="nav-links">
-          <li><a href="#llm-vs-lmm">LLM vs LMM</a></li>
+          <li><a href="#compare">LLM vs LMM</a></li>
+          <li><a href="#viz">Visualize</a></li>
+          <li><a href="#any2any">Any2Any</a></li>
         </ul>
       </nav>
 
+      {/* Hero */}
       <section className="hero">
+        <div className="bg-grid" />
+        <div className="bg-orb bg-orb-1" />
+        <div className="bg-orb bg-orb-2" />
+
         <div className="hero-content">
-          <div className="hero-eyebrow">Understanding AI Models</div>
+          <div className="hero-badge">
+            <span className="hero-badge-dot" />
+            Understanding AI Models
+          </div>
           <h1>LLM <em>vs</em> LMM</h1>
           <p className="hero-tagline">
-            What's the difference? Click play to see.
+            Large Language Models process text. Large Multimodal Models understand text, images, audio, and video — together.
           </p>
-        </div>
-        <div className="hero-decoration">
-          <svg viewBox="0 0 300 300" fill="none">
-            <circle cx="150" cy="150" r="140" stroke="currentColor" strokeWidth="0.5" opacity="0.3"/>
-            <circle cx="150" cy="150" r="100" stroke="currentColor" strokeWidth="0.5" opacity="0.2"/>
-            <circle cx="150" cy="150" r="60" stroke="currentColor" strokeWidth="0.5" opacity="0.1"/>
-            <line x1="150" y1="10" x2="150" y2="290" stroke="currentColor" strokeWidth="0.3" opacity="0.1"/>
-            <line x1="10" y1="150" x2="290" y2="150" stroke="currentColor" strokeWidth="0.3" opacity="0.1"/>
-          </svg>
+          <div className="hero-actions">
+            <button className="btn-primary" onClick={scrollToViz}>
+              See the difference <Icons.ArrowDown />
+            </button>
+            <a href="#compare" className="btn-ghost">Learn more</a>
+          </div>
         </div>
       </section>
 
-      <section className="section" id="llm-vs-lmm">
-        <div className="section-header">
-          <div>
+      {/* LLM vs LMM Comparison */}
+      <Reveal>
+        <section className="section" id="compare">
+          <div className="section-header">
+            <div className="section-label">Core Concepts</div>
             <h2 className="section-title">LLM vs LMM</h2>
-            <p className="section-subtitle">Large Language Models vs Large Multimodal Models</p>
-          </div>
-        </div>
-
-        <div className="benchmarks-grid">
-          <div className="benchmark-card">
-            <div className="benchmark-header">
-              <h3>LLM — Language Only</h3>
-            </div>
-            <p className="benchmark-desc">
-              A Large Language Model processes and generates text only. It can read documents, write code, answer questions — but cannot see images, hear audio, or understand video.
-            </p>
-            <div className="benchmark-bar">
-              <div className="benchmark-fill" style={{ width: '25%' }}></div>
-            </div>
-            <p className="benchmark-full" style={{fontSize: '12px', color: '#888'}}>Text: 100%</p>
+            <p className="section-subtitle">The difference is simple — LMMs add perception beyond text.</p>
           </div>
 
-          <div className="benchmark-card">
-            <div className="benchmark-header">
-              <h3>LMM — Multimodal</h3>
+          <div className="compare-grid">
+            <div className="compare-card llm">
+              <div className="card-icon">Aa</div>
+              <h3 className="card-title">LLM</h3>
+              <span className="card-badge">Language Only</span>
+              <p className="card-desc">
+                A Large Language Model reads and generates text. It can write code, answer questions, and summarize documents — but it cannot see images, hear audio, or watch video.
+              </p>
+              <div className="modality-tags">
+                <span className="modality-tag tag-on">Text</span>
+                <span className="modality-tag tag-off">Image</span>
+                <span className="modality-tag tag-off">Audio</span>
+                <span className="modality-tag tag-off">Video</span>
+              </div>
             </div>
-            <p className="benchmark-desc">
-              A Large Multimodal Model adds image, audio, and video understanding to text. It can analyze a chart, transcribe speech, or understand what's happening in a video.
-            </p>
-            <div className="benchmark-bar">
-              <div className="benchmark-fill" style={{ width: '100%' }}></div>
+
+            <div className="compare-card lmm">
+              <div className="card-icon">◈</div>
+              <h3 className="card-title">LMM</h3>
+              <span className="card-badge">Multimodal</span>
+              <p className="card-desc">
+                A Large Multimodal Model extends text understanding with visual and audio perception. It can analyze a chart, describe a photo, transcribe speech, or summarize a video — all within one model.
+              </p>
+              <div className="modality-tags">
+                <span className="modality-tag tag-on">Text</span>
+                <span className="modality-tag tag-on">Image</span>
+                <span className="modality-tag tag-on">Audio</span>
+                <span className="modality-tag tag-on">Video</span>
+              </div>
             </div>
-            <p className="benchmark-full" style={{fontSize: '12px', color: '#888'}}>Text + Image + Audio + Video</p>
           </div>
-        </div>
+        </section>
+      </Reveal>
 
-        <div className="scoring-formula" style={{ marginTop: '40px' }}>
-          <h3>See It In Action</h3>
-          <LLMvsLMMAnimation />
-        </div>
+      {/* Interactive Visualization */}
+      <Reveal>
+        <section className="section" id="viz">
+          <div className="section-header">
+            <div className="section-label">Interactive</div>
+            <h2 className="section-title">Watch the Difference</h2>
+            <p className="section-subtitle">Play the animation to see how modalities expand from LLM to LMM.</p>
+          </div>
+          <ModalityVisualization />
+        </section>
+      </Reveal>
 
-        <div className="scoring-formula" style={{ marginTop: '40px' }}>
-          <h3>The Key Difference</h3>
-          <code>LLM → Text only</code>
-          <p>LLMs are powerful text processors. They learn from massive text corpora and can generate human-like text, translate languages, summarize documents, and write code.</p>
-          <code style={{ marginTop: '20px' }}>LMM → Text + Images + Audio + Video</code>
-          <p>LMMs extend LLMs with perception of other modalities. They can "see" images, "hear" audio, and "understand" video — making them suitable for tasks like image captioning, video analysis, and voice assistants.</p>
-        </div>
+      {/* Any2Any */}
+      <Reveal>
+        <section className="section" id="any2any">
+          <div className="section-header">
+            <div className="section-label">Beyond LMM</div>
+            <h2 className="section-title">Any2Any</h2>
+            <p className="section-subtitle">The ultimate vision — LMM is the technical foundation to achieve it.</p>
+          </div>
 
-        <div className="benchmarks-grid" style={{ marginTop: '60px' }}>
-          <div className="benchmark-card" style={{ gridColumn: 'span 2' }}>
-            <div className="benchmark-header">
-              <h3>Any2Any — The Ultimate Goal</h3>
-            </div>
-            <p className="benchmark-desc">
-              <strong>Any2Any</strong> (Any-to-Any) is a <em>functional vision</em> — a system that can receive any combination of modality inputs (text, image, audio, video) and generate any combination of modality outputs. <strong>LMM</strong> is the <em>technical foundation</em> — the most powerful approach currently used to achieve this goal.
-            </p>
-            <div style={{ marginTop: '20px', padding: '15px', background: 'var(--surface-elevated)', borderRadius: '8px' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+          <div className="any2any-grid">
+            <div className="info-card full-width">
+              <div className="info-card-icon">∞</div>
+              <h3>LMM x Any2Any</h3>
+              <p>
+                <strong>Any2Any</strong> is a <em>functional vision</em>: a system that accepts any combination of modalities as input and produces any combination as output. <strong>LMM</strong> is the <em>technical foundation</em> — the most powerful approach we have today to realize that vision.
+              </p>
+              <table className="compare-table">
                 <thead>
-                  <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                    <th style={{ textAlign: 'left', padding: '8px', color: 'var(--accent)' }}>Dimension</th>
-                    <th style={{ textAlign: 'left', padding: '8px', color: 'var(--accent)' }}>LMM</th>
-                    <th style={{ textAlign: 'left', padding: '8px', color: 'var(--accent)' }}>Any2Any</th>
-                  </tr>
+                  <tr><th>Dimension</th><th>LMM</th><th>Any2Any</th></tr>
                 </thead>
-                <tbody style={{ color: 'var(--text-secondary)' }}>
-                  <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                    <td style={{ padding: '8px' }}>Nature</td>
-                    <td style={{ padding: '8px' }}>Model type / Architecture</td>
-                    <td style={{ padding: '8px' }}>Task capability / Goal scope</td>
-                  </tr>
-                  <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                    <td style={{ padding: '8px' }}>Focus</td>
-                    <td style={{ padding: '8px' }}>Large scale, unified representation</td>
-                    <td style={{ padding: '8px' }}>Input/output flexibility</td>
-                  </tr>
-                  <tr>
-                    <td style={{ padding: '8px' }}>Relationship</td>
-                    <td style={{ padding: '8px' }}>Technical means: provides the "brain"</td>
-                    <td style={{ padding: '8px' }}>Application form: full-range interaction capability</td>
-                  </tr>
+                <tbody>
+                  <tr><td>Nature</td><td>Model type / Architecture</td><td>Task capability / Goal</td></tr>
+                  <tr><td>Focus</td><td>Scale, unified representation</td><td>Input / output flexibility</td></tr>
+                  <tr><td>Role</td><td>Technical means — the "brain"</td><td>Application form — full interaction</td></tr>
                 </tbody>
               </table>
             </div>
-          </div>
 
-          <div className="benchmark-card">
-            <div className="benchmark-header">
+            <div className="info-card">
+              <div className="info-card-icon">🔬</div>
               <h3>NExT-GPT</h3>
+              <p>The first end-to-end Any-to-Any MM-LLM. Accepts any combination of text, image, audio, and video, and generates any-modality output through integrated diffusion decoders.</p>
             </div>
-            <p className="benchmark-desc">
-              Considered the first end-to-end Any-to-Any MM-LLM. It can input any combination of text, image, audio, and video, and generate corresponding any-modality output.
-            </p>
-          </div>
 
-          <div className="benchmark-card">
-            <div className="benchmark-header">
+            <div className="info-card">
+              <div className="info-card-icon">⚡</div>
               <h3>GPT-4o</h3>
+              <p>OpenAI's flagship natively unifying audio, visual, and text processing in a single model — a major step toward seamless Any2Any interaction.</p>
             </div>
-            <p className="benchmark-desc">
-              OpenAI's flagship model marking native LMM's march toward more perfect Any2Any experience — unifying audio, visual, and text processing in a single model.
-            </p>
           </div>
-        </div>
+        </section>
+      </Reveal>
 
-        <div className="scoring-formula" style={{ marginTop: '40px' }}>
-          <h3>Evolution Path</h3>
-          <code>LLM → Basic LMM → Any2Any LMM</code>
-          <p>
-            <strong>Basic LMM</strong>: Focuses on "understanding" — recognizing images, visual Q&A (like early LLaVA).<br/>
-            <strong>Any2Any LMM</strong>: Adds "generation" capability on top of understanding — using decoders like Diffusion models for full modality transformation.
-          </p>
-        </div>
-      </section>
+      {/* Evolution */}
+      <Reveal>
+        <section className="section evo-section">
+          <div className="section-header">
+            <div className="section-label">Evolution</div>
+            <h2 className="section-title">The Path Forward</h2>
+            <p className="section-subtitle" style={{margin:'0 auto'}}>From text-only models to full multimodal understanding.</p>
+          </div>
 
+          <div className="evo-path">
+            <div className="evo-step">
+              <div className="evo-step-icon">Aa</div>
+              <h4>LLM</h4>
+              <p>Text only</p>
+            </div>
+            <span className="evo-arrow">→</span>
+            <div className="evo-step">
+              <div className="evo-step-icon">◈</div>
+              <h4>Basic LMM</h4>
+              <p>Understanding</p>
+            </div>
+            <span className="evo-arrow">→</span>
+            <div className="evo-step">
+              <div className="evo-step-icon">∞</div>
+              <h4>Any2Any LMM</h4>
+              <p>Full generation</p>
+            </div>
+          </div>
+
+          <div className="evo-detail">
+            <div className="evo-detail-card">
+              <h4>Basic LMM — Understanding</h4>
+              <p>Focuses on perception: recognizing images, answering visual questions, captioning photos. Early models like LLaVA pioneered this — input multiple modalities, but output only text.</p>
+            </div>
+            <div className="evo-detail-card">
+              <h4>Any2Any LMM — Generation</h4>
+              <p>Adds generation on top of understanding. Uses diffusion decoders or native multimodal output heads to produce images, audio, and video — not just text — from any input combination.</p>
+            </div>
+          </div>
+        </section>
+      </Reveal>
+
+      {/* Footer */}
       <footer className="footer">
-        <div className="footer-content">
-          <div className="footer-logo">
-            <span className="logo-dot"></span>
-            LMM.best
-          </div>
-          <p className="footer-text">
-            LMM = Large Multimodal Model
-          </p>
-        </div>
+        <div className="footer-logo"><span className="logo-dot" />LMM.best</div>
+        <p className="footer-text">LMM = Large Multimodal Model</p>
       </footer>
     </>
   )
